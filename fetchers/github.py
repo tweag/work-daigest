@@ -18,7 +18,10 @@ class GitHubComment:
 BASE_URL = "https://api.github.com/search"
 
 def fetch_issue_comments(handle: str) -> list[GitHubComment]:
-    response = requests.get(f"{BASE_URL}/issues?q=commenter:{handle}")
+    """
+    Fetch all GitHub issue comments authored by user `handle`
+    """
+    response = requests.get(f"{BASE_URL}/issues?q=is:issue+commenter:{handle}")
     return [
         GitHubComment(
             # use datetime string of form "YYYY-MM-DDTHH:MM:SSZ" and convert into datetime object
