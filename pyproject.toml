@@ -1,0 +1,48 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "week-dAIgest"
+version = "0.1.0"
+description = ""
+authors = [
+  "Nour El Mawass <nour.elmawass@tweag.io>",
+  "Simeon Carstens <simeon.carstens@tweag.io>"
+]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+ics = "^0.7.2"
+setuptools = "^68.2.2"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.9.1"
+isort = "^5.12.0"
+ruff = "^0.0.290"
+fawltydeps = "^0.13.1"
+
+[tool.poetry.group.notebook.dependencies]
+jupyter = "^1.0.0"
+notebook = "^7.0.4"
+pandas = ">=2.0.1, <3.0.0"
+
+
+[tool.isort]
+profile = "black"
+
+[tool.ruff]
+select = ["F", "I", "PD"]
+
+[tool.fawltydeps]
+ignore_unused = [
+  "jupyter",
+  "notebook",
+  "black",
+  "isort",
+  "fawltydeps",
+  "mypy",
+  "pylint",
+  "ruff",
+]
