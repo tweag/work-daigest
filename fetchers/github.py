@@ -15,17 +15,25 @@ class GitHubComment:
     repository: RepositoryName
 
 
+def to_github_datetime_format(dt: datetime.datetime) -> str:
+    """
+    Convert a datetime object to the format used by GitHub's API
+    """
+    return dt.isoformat()[:-7] + "Z"
+
 BASE_URL = "https://api.github.com/search"
+DATETIME_LOWER_BOUND = (datetime.datetime.now() - datetime.timedelta(days=7))
+DATETIME_UPPER_BOUND = datetime.datetime.now()
+# TODO: could also try to use "updated_at" or "closed_at" fields
+DATETIME_FILTER = f"created:<{to_github_datetime_format(DATETIME_UPPER_BOUND)}+created:>{to_github_datetime_format(DATETIME_LOWER_BOUND)}"
 
 def fetch_issues(handle: str) -> list[GitHubComment]:
     """
     Fetch all GitHub issues authored by user `handle`
     """
-    response = requests.get(f"{BASE_URL}/issues?q=is:issue+author:{handle}+commenter:{handle}")
+    response = requests.get(f"{BASE_URL}/issues?q=is:issue+author:{handle}+{DATETIME_FILTER}")
     return [
         GitHubComment(
-            # use datetime string of form "YYYY-MM-DDTHH:MM:SSZ" and convert into datetime object
-            # TODO: could also try to use "updated_at" or "closed_at" fields
             dateutil.parser.parse(comment_json["created_at"]),
             CommentText(comment_json["body"]),
             # example repo URL: https://api.github.com/repos/tweag/chainsail
@@ -40,7 +48,7 @@ def fetch_prs(handle: str) -> list[GitHubComment]:
     """
     Fetch all GitHub pull requests authored by user `handle`
     """
-    response = requests.get(f"{BASE_URL}/issues?q=is:pull-request+author:{handle}+commenter:{handle}")
+    response = requests.get(f"{BASE_URL}/issues?q=is:pull-request+author:{handle}+{DATETIME_FILTER}")
     return [
         GitHubComment(
             dateutil.parser.parse(comment_json["created_at"]),
