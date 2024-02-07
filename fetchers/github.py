@@ -49,7 +49,7 @@ def fetch_issues(handle: str) -> list[GitHubComment]:
         latest_action, date = get_latest_action(comment_json)
         all_comments.append(
             GitHubComment(
-                date,
+                dateutil.parser.parse(date),
                 CommentText(comment_json["body"]),
                 # example repo URL: https://api.github.com/repos/tweag/chainsail
                 # so we use "tweag/chainsail" as human-readable repo identifier
@@ -71,7 +71,7 @@ def fetch_prs(handle: str) -> list[GitHubComment]:
         latest_action, date = get_latest_action(comment_json)
         all_comments.append(
             GitHubComment(
-                date,
+                dateutil.parser.parse(date),
                 CommentText(comment_json["body"]),
                 # example repo URL: https://api.github.com/repos/tweag/chainsail
                 # so we use "tweag/chainsail" as human-readable repo identifier
