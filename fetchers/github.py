@@ -36,12 +36,28 @@ def fetch_issue_comments(handle: str) -> list[GitHubComment]:
         for comment_json in response.json()["items"]
     ]
 
+def fetch_pr_comments(handle: str) -> list[GitHubComment]:
+    """
+    Fetch all GitHub pull request comments authored by user `handle`
+    """
+    response = requests.get(f"{BASE_URL}/issues?q=is:pull-request+commenter:{handle}")
+    return [
+        GitHubComment(
+            dateutil.parser.parse(comment_json["created_at"]),
+            CommentText(comment_json["body"]),
+            RepositoryName("/".join(comment_json["repository_url"].split("/")[-2:]))
+        )
+
+        for comment_json in response.json()["items"]
+    ]
+
 def fetch_comments(handle: str) -> list[GitHubComment]:
     """
     Fetch all GitHub comments authored by user `handle`
     """
     all_comments = []
     all_comments.append(fetch_issue_comments(handle))
+    all_comments.append(fetch_pr_comments(handle))
     return all_comments
 
 if __name__ == "__main__":
