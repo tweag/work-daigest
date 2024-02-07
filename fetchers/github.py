@@ -22,7 +22,7 @@ def to_github_datetime_format(dt: datetime.datetime) -> str:
     return dt.isoformat()[:-7] + "Z"
 
 BASE_URL = "https://api.github.com/search"
-DATETIME_LOWER_BOUND = (datetime.datetime.now() - datetime.timedelta(days=7))
+DATETIME_LOWER_BOUND = (datetime.datetime.now() - datetime.timedelta(days=21))
 DATETIME_UPPER_BOUND = datetime.datetime.now()
 # TODO: could also try to use "updated_at" or "closed_at" fields
 DATETIME_FILTER = f"created:<{to_github_datetime_format(DATETIME_UPPER_BOUND)}+created:>{to_github_datetime_format(DATETIME_LOWER_BOUND)}"
