@@ -17,9 +17,9 @@ class GitHubComment:
 
 BASE_URL = "https://api.github.com/search"
 
-def fetch_issue_comments(handle: str) -> list[GitHubComment]:
+def fetch_issues(handle: str) -> list[GitHubComment]:
     """
-    Fetch all GitHub issue comments authored by user `handle`
+    Fetch all GitHub issues authored by user `handle`
     """
     response = requests.get(f"{BASE_URL}/issues?q=is:issue+author:{handle}+commenter:{handle}")
     return [
@@ -36,9 +36,9 @@ def fetch_issue_comments(handle: str) -> list[GitHubComment]:
         for comment_json in response.json()["items"]
     ]
 
-def fetch_pr_comments(handle: str) -> list[GitHubComment]:
+def fetch_prs(handle: str) -> list[GitHubComment]:
     """
-    Fetch all GitHub pull request comments authored by user `handle`
+    Fetch all GitHub pull requests authored by user `handle`
     """
     response = requests.get(f"{BASE_URL}/issues?q=is:pull-request+author:{handle}+commenter:{handle}")
     return [
@@ -56,8 +56,8 @@ def fetch_comments(handle: str) -> list[GitHubComment]:
     Fetch all GitHub comments authored by user `handle`
     """
     all_comments = []
-    all_comments.append(fetch_issue_comments(handle))
-    all_comments.append(fetch_pr_comments(handle))
+    all_comments.append(fetch_issues(handle))
+    all_comments.append(fetch_prs(handle))
     return all_comments
 
 if __name__ == "__main__":
