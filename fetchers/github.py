@@ -59,6 +59,22 @@ def fetch_prs(handle: str) -> list[GitHubComment]:
         for comment_json in response.json()["items"]
     ]
 
+def fetch_commits(handle: str) -> list[GitHubComment]:
+    """
+    Fetch all GitHub commits authored by user `handle`
+    """
+    datetime_filter = f"author-date:{to_github_datetime_format(DATETIME_LOWER_BOUND)}..{to_github_datetime_format(DATETIME_UPPER_BOUND)}"
+    response = requests.get(f"{BASE_URL}/commits?q=author:{handle}+committer:{handle}+{datetime_filter}")
+    return [
+        GitHubComment(
+            dateutil.parser.parse(comment_json["commit"]["author"]["date"]),
+            CommentText(comment_json["commit"]["message"]),
+            RepositoryName(comment_json["repository"]["full_name"])
+        )
+        for comment_json in response.json()["items"]
+    ]
+
+
 def fetch_comments(handle: str) -> list[GitHubComment]:
     """
     Fetch all GitHub comments authored by user `handle`
@@ -66,6 +82,7 @@ def fetch_comments(handle: str) -> list[GitHubComment]:
     all_comments = []
     all_comments.append(fetch_issues(handle))
     all_comments.append(fetch_prs(handle))
+    all_comments.append(fetch_commits(handle))
     return all_comments
 
 if __name__ == "__main__":
