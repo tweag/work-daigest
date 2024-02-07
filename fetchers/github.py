@@ -24,14 +24,14 @@ def to_github_datetime_format(dt: datetime.datetime) -> str:
 BASE_URL = "https://api.github.com/search"
 DATETIME_LOWER_BOUND = (datetime.datetime.now() - datetime.timedelta(days=21))
 DATETIME_UPPER_BOUND = datetime.datetime.now()
-# TODO: could also try to use "updated_at" or "closed_at" fields
-DATETIME_FILTER = f"created:<{to_github_datetime_format(DATETIME_UPPER_BOUND)}+created:>{to_github_datetime_format(DATETIME_LOWER_BOUND)}"
 
 def fetch_issues(handle: str) -> list[GitHubComment]:
     """
     Fetch all GitHub issues authored by user `handle`
     """
-    response = requests.get(f"{BASE_URL}/issues?q=is:issue+author:{handle}+{DATETIME_FILTER}")
+    # TODO: could also try to use "updated_at" or "closed_at" fields
+    datetime_filter = f"created:{to_github_datetime_format(DATETIME_LOWER_BOUND)}..{to_github_datetime_format(DATETIME_UPPER_BOUND)}"
+    response = requests.get(f"{BASE_URL}/issues?q=is:issue+author:{handle}+{datetime_filter}")
     return [
         GitHubComment(
             dateutil.parser.parse(comment_json["created_at"]),
@@ -48,7 +48,9 @@ def fetch_prs(handle: str) -> list[GitHubComment]:
     """
     Fetch all GitHub pull requests authored by user `handle`
     """
-    response = requests.get(f"{BASE_URL}/issues?q=is:pull-request+author:{handle}+{DATETIME_FILTER}")
+    # TODO: could also try to use "updated_at" or "closed_at" fields
+    datetime_filter = f"created:{to_github_datetime_format(DATETIME_LOWER_BOUND)}..{to_github_datetime_format(DATETIME_UPPER_BOUND)}"
+    response = requests.get(f"{BASE_URL}/issues?q=is:pull-request+author:{handle}+{datetime_filter}")
     return [
         GitHubComment(
             dateutil.parser.parse(comment_json["created_at"]),
