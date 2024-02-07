@@ -21,7 +21,7 @@ def fetch_issue_comments(handle: str) -> list[GitHubComment]:
     """
     Fetch all GitHub issue comments authored by user `handle`
     """
-    response = requests.get(f"{BASE_URL}/issues?q=is:issue+commenter:{handle}")
+    response = requests.get(f"{BASE_URL}/issues?q=is:issue+author:{handle}+commenter:{handle}")
     return [
         GitHubComment(
             # use datetime string of form "YYYY-MM-DDTHH:MM:SSZ" and convert into datetime object
@@ -40,7 +40,7 @@ def fetch_pr_comments(handle: str) -> list[GitHubComment]:
     """
     Fetch all GitHub pull request comments authored by user `handle`
     """
-    response = requests.get(f"{BASE_URL}/issues?q=is:pull-request+commenter:{handle}")
+    response = requests.get(f"{BASE_URL}/issues?q=is:pull-request+author:{handle}+commenter:{handle}")
     return [
         GitHubComment(
             dateutil.parser.parse(comment_json["created_at"]),
