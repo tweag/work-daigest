@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import datetime
 import dateutil.parser
+import os
 import requests
 from typing import Literal, NewType
 
@@ -27,6 +28,23 @@ BASE_URL = "https://api.github.com/search"
 DATETIME_LOWER_BOUND = (datetime.datetime.now() - datetime.timedelta(days=31))
 DATETIME_UPPER_BOUND = datetime.datetime.now()
 
+HEADERS = {
+    "Accept": "application/vnd.github.v3+json",
+}
+if token := os.getenv("GITHUB_TOKEN"):
+    HEADERS["Authorization"] = f"token {token}"
+
+def send_query(url: str, query: str) -> dict:
+    """
+    Send a query to the GitHub API and return the JSON response
+    """
+    response = requests.get(
+        f"{url}?q={query}",
+        headers=HEADERS
+    )
+    response.raise_for_status()
+    return response.json()
+
 def get_latest_action(comment_json: dict) -> (str, str):
     min_date = "1970-01-01T00:00:00Z"
     created = ("created", comment_json.get("created_at") or min_date)
@@ -43,9 +61,9 @@ def fetch_issues(handle: str) -> list[GitHubComment]:
     """
     # TODO: could also try to use "updated_at" or "closed_at" fields
     datetime_filter = f"created:{to_github_datetime_format(DATETIME_LOWER_BOUND)}..{to_github_datetime_format(DATETIME_UPPER_BOUND)}"
-    response = requests.get(f"{BASE_URL}/issues?q=is:issue+author:{handle}+{datetime_filter}")
+    response = send_query(f"{BASE_URL}/issues", f"is:issue+author:{handle}+{datetime_filter}")
     all_comments = []
-    for comment_json in response.json()["items"]:
+    for comment_json in response["items"]:
         latest_action, date = get_latest_action(comment_json)
         all_comments.append(
             GitHubComment(
@@ -65,9 +83,9 @@ def fetch_prs(handle: str) -> list[GitHubComment]:
     """
     # TODO: could also try to use "updated_at" or "closed_at" fields
     datetime_filter = f"created:{to_github_datetime_format(DATETIME_LOWER_BOUND)}..{to_github_datetime_format(DATETIME_UPPER_BOUND)}"
-    response = requests.get(f"{BASE_URL}/issues?q=is:pull-request+author:{handle}+{datetime_filter}")
+    response = send_query(f"{BASE_URL}/issues", f"is:pull-request+author:{handle}+{datetime_filter}")
     all_comments = []
-    for comment_json in response.json()["items"]:
+    for comment_json in response["items"]:
         latest_action, date = get_latest_action(comment_json)
         all_comments.append(
             GitHubComment(
@@ -86,7 +104,7 @@ def fetch_commits(handle: str) -> list[GitHubComment]:
     Fetch all GitHub commits authored by user `handle`
     """
     datetime_filter = f"author-date:{to_github_datetime_format(DATETIME_LOWER_BOUND)}..{to_github_datetime_format(DATETIME_UPPER_BOUND)}"
-    response = requests.get(f"{BASE_URL}/commits?q=author:{handle}+committer:{handle}+{datetime_filter}")
+    response = send_query(f"{BASE_URL}/commits", f"author:{handle}+committer:{handle}+{datetime_filter}")
     return [
         GitHubComment(
             dateutil.parser.parse(comment_json["commit"]["author"]["date"]),
@@ -94,7 +112,7 @@ def fetch_commits(handle: str) -> list[GitHubComment]:
             RepositoryName(comment_json["repository"]["full_name"]),
             "committed"
         )
-        for comment_json in response.json()["items"]
+        for comment_json in response["items"]
     ]
 
 
