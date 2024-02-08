@@ -39,7 +39,7 @@ def send_query(url: str, query: str) -> dict:
     Send a query to the GitHub API and return the JSON response
     """
     response = requests.get(
-        f"{url}?q={query}",
+        f"{url}?q={query}&per_page=100",
         headers=HEADERS
     )
     response.raise_for_status()
