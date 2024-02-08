@@ -17,6 +17,7 @@ python = "^3.11"
 ics = "^0.7.2"
 setuptools = "^68.2.2"
 requests = "^2.31.0"
+boto3 = "^1.34.37"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"

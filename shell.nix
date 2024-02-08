@@ -8,6 +8,8 @@
 pkgs.mkShell {
   name = "confluence-qa-env";
   buildInputs = with pkgs; [
+    awscli2
+    ssm-session-manager-plugin
     python311
     poetry
   ];
