@@ -30,11 +30,13 @@ def invoke_jurassic2(client, jurassic_model, prompt):
         # The different model providers have individual request and response formats.
         # For the format, ranges, and default values for AI21 Labs Jurassic-2, refer to:
         # https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-jurassic2.html
-
+        # The parameters below are just a (subjectively) relevant subset of the available
+        # parameters.
         body = {
             "prompt": prompt,
             "temperature": 0.5,
-            "maxTokens": 1000,
+            "topP": 0.5,
+            "maxTokens": 200,
         }
 
         response = client.invoke_model(
