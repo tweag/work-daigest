@@ -1,5 +1,7 @@
+import dataclasses
 from dataclasses import dataclass
 import datetime
+import json
 import dateutil.parser
 import os
 import requests
@@ -127,4 +129,9 @@ def fetch_comments(handle: str) -> list[GitHubComment]:
     return all_comments
 
 if __name__ == "__main__":
-    print(fetch_comments("simeoncarstens")[:10])
+    comments = fetch_comments("simeoncarstens")
+    # Flatten list: why does this work? https://stackoverflow.com/a/952946/1656472
+    # Tweag style!
+    comments = sum(comments, [])
+    # Without `default=str`, `dumps` will fail on `datetime` objects
+    print(json.dumps(list(map(dataclasses.asdict, comments)), default=str))
