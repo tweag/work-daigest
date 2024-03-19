@@ -81,6 +81,44 @@ def invoke_llama2(client, model_id: str, prompt: str) -> str:
         logger.error("Couldn't invoke Llama 2")
         raise
 
+def invoke_claude3(client, prompt: str, model_id: str = "anthropic.claude-3-sonnet-20240229-v1:0") -> str:
+    """
+    Invokes the Anthropics Claude-3 large-language model to run an inference
+    using the input provided in the request body.
+
+    :param client: `boto3.client` object for the Bedrock service.
+    :param claude_model: The model ID for the Claude-3 model you want to use.
+    :param prompt: The prompt that you want Claude-3 to complete.
+    :return: Inference response from the model.
+    """
+
+    try:
+        body = {
+            "anthropic_version": "bedrock-2023-05-31",
+            "max_tokens": 1000,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": prompt
+                        }
+                    ]
+                }
+            ]
+        }
+        response = client.invoke_model(
+            modelId=model_id, body=json.dumps(body)
+        )
+        response_body = json.loads(response["body"].read())
+        completion = response_body["content"][0]["text"]
+
+        return completion
+
+    except ClientError as e:
+        logger.error("Couldn't invoke Claude-3")
+        raise e
 
 if __name__ == '__main__':
     client = init_client('bedrock', 'us-east-1')
