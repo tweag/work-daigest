@@ -51,7 +51,7 @@ def invoke_jurassic2(client, jurassic_model, prompt):
         raise
 
 
-def invoke_llama2(client, llama_model: str, prompt: str) -> str:
+def invoke_llama2(client, model_id: str, prompt: str) -> str:
     """
     Invokes the Meta Llama 2 large-language model to run an inference
     using the input provided in the request body.
@@ -69,7 +69,7 @@ def invoke_llama2(client, llama_model: str, prompt: str) -> str:
         }
 
         response = client.invoke_model(
-            modelId=llama_model, body=json.dumps(body)
+            modelId=model_id, body=json.dumps(body)
         )
 
         response_body = json.loads(response["body"].read())
