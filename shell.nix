@@ -1,12 +1,9 @@
-{
-  pkgs ? import (builtins.fetchTarball {
-    # Branch: nixos-unstable
-    url = "https://github.com/NixOS/nixpkgs/archive/92236affa23a5a44ade5fa78e31c674a10b2ab94.tar.gz";
-    sha256 = "0q478xh71h4alnaangz8ayk3xffnr08wawbk84cd4rqgisj7qk6f";
-  }) { }
-}:
+{ pkgs ? import (builtins.fetchTarball {
+  url = "https://github.com/NixOS/nixpkgs/archive/release-23.11.tar.gz";
+  sha256 = "0x4s7g24mwkhf205d0dwmgcqr2jglkffn8xicwmab3crkfdr4cqh";
+}) { } }:
 pkgs.mkShell {
-  name = "confluence-qa-env";
+  name = "week-dAIgest-env";
   buildInputs = with pkgs; [
     awscli2
     ssm-session-manager-plugin
