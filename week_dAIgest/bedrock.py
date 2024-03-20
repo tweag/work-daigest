@@ -17,7 +17,7 @@ def init_client(service_name: str, region_name: str):
     return boto3.client(service_name, region_name=region_name)
 
 
-def invoke_jurassic2(client, prompt: str, model_id: str = "ai21.j2-ultra-v1") -> str:
+def invoke_jurassic2(client, prompt: str, model_id: str = "ai21.j2-jumbo-instruct") -> str:
     """
     Invokes the AI21 Labs Jurassic-2 large-language model to run an inference
     using the input provided in the request body.
