@@ -96,6 +96,8 @@ def invoke_claude3(client, prompt: str, model_id: str = "anthropic.claude-3-sonn
         body = {
             "anthropic_version": "bedrock-2023-05-31",
             "max_tokens": 1000,
+            "temperature": 0.3,
+            "top_p": 0.3,
             "messages": [
                 {
                     "role": "user",
