@@ -11,6 +11,9 @@ authors = [
   "Simeon Carstens <simeon.carstens@tweag.io>"
 ]
 readme = "README.md"
+packages = [
+  { include = "week_dAIgest" }
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
