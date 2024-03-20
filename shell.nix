@@ -1,9 +1,7 @@
-{
-  pkgs ? import (builtins.fetchTarball {
-    url = "https://github.com/NixOS/nixpkgs/archive/release-23.11.tar.gz";
-    sha256 = "0x4s7g24mwkhf205d0dwmgcqr2jglkffn8xicwmab3crkfdr4cqh";
-  }) { }
-}:
+{ pkgs ? import (builtins.fetchTarball {
+  url = "https://github.com/NixOS/nixpkgs/archive/release-23.11.tar.gz";
+  sha256 = "0x4s7g24mwkhf205d0dwmgcqr2jglkffn8xicwmab3crkfdr4cqh";
+}) { } }:
 pkgs.mkShell {
   name = "week-dAIgest-env";
   buildInputs = with pkgs; [
