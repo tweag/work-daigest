@@ -17,12 +17,14 @@ def init_client(service_name: str, region_name: str):
     return boto3.client(service_name, region_name=region_name)
 
 
-def invoke_jurassic2(client, jurassic_model, prompt):
+def invoke_jurassic2(client, prompt: str, model_id: str = "ai21.j2-jumbo-instruct") -> str:
     """
     Invokes the AI21 Labs Jurassic-2 large-language model to run an inference
     using the input provided in the request body.
 
+    :param client: A `boto3.client` object for the `bedrock-runtime` service.
     :param prompt: The prompt that you want Jurassic-2 to complete.
+    :param model_id: The model ID of the Jurassic-2 model to invoke.
     :return: Inference response from the model.
     """
 
@@ -30,15 +32,17 @@ def invoke_jurassic2(client, jurassic_model, prompt):
         # The different model providers have individual request and response formats.
         # For the format, ranges, and default values for AI21 Labs Jurassic-2, refer to:
         # https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-jurassic2.html
-
+        # The parameters below are just a (subjectively) relevant subset of the available
+        # parameters.
         body = {
             "prompt": prompt,
             "temperature": 0.5,
-            "maxTokens": 1000,
+            "topP": 0.5,
+            "maxTokens": 200,
         }
 
         response = client.invoke_model(
-            modelId=jurassic_model, body=json.dumps(body)
+            modelId=model_id, body=json.dumps(body)
         )
 
         response_body = json.loads(response["body"].read())
