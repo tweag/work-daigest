@@ -5,7 +5,7 @@
   }) { }
 }:
 pkgs.mkShell {
-  name = "confluence-qa-env";
+  name = "week-dAIgest-env";
   buildInputs = with pkgs; [
     awscli2
     ssm-session-manager-plugin
