@@ -22,7 +22,9 @@ def invoke_jurassic2(client, prompt, model_id="ai21.j2-ultra-v1"):
     Invokes the AI21 Labs Jurassic-2 large-language model to run an inference
     using the input provided in the request body.
 
+    :param client: A `boto3.client` object for the `bedrock-runtime` service.
     :param prompt: The prompt that you want Jurassic-2 to complete.
+    :param model_id: The model ID of the Jurassic-2 model to invoke.
     :return: Inference response from the model.
     """
 
