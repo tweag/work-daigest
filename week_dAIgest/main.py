@@ -66,15 +66,19 @@ def munge_github_data(file_path: str) -> str:
 
     return json.dumps(github_data)
 
-github_data = munge_github_data("github_data.json")
-calendar_data = munge_calendar_data("calendar.ics", datetime.datetime.now() - datetime.timedelta(days=60), datetime.datetime.now(), "simeon.carstens@tweag.io")
+def main():
+    github_data = munge_github_data("github_data.json")
+    calendar_data = munge_calendar_data("calendar.ics", datetime.datetime.now() - datetime.timedelta(days=60), datetime.datetime.now(), "simeon.carstens@tweag.io")
+    runtime_client = init_client('bedrock-runtime', 'us-east-1')
 
-runtime_client = init_client('bedrock-runtime', 'us-east-1')
+    # res = invoke_llama2(runtime_client, model_id=model_name, prompt=PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data))
+    # res = invoke_jurassic2(runtime_client, model_id=model_name, prompt=PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data))
+    res = invoke_claude3(
+        runtime_client,
+        prompt=PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data)
+    )
+    print(res)
 
-# res = invoke_llama2(runtime_client, model_id=model_name, prompt=PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data))
-# res = invoke_jurassic2(runtime_client, model_id=model_name, prompt=PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data))
-res = invoke_claude3(
-    runtime_client,
-    prompt=PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data)
-)
-print(res)
+
+if __name__ == "__main__":
+    main()
