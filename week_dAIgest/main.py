@@ -68,14 +68,14 @@ def munge_github_data(file_path: str) -> str:
 
     return json.dumps(github_data)
 
-def main(calendar_data_file: str, github_data_file: str, model_invocation_fn: Callable[[str], str]):
+def main(calendar_data_file: str, email: str, github_data_file: str, model_invocation_fn: Callable[[str], str]):
     """
     Main program flow.
 
     :param calendar_data_file: Path to .ics file containing calendar data
     :param github_data_file: Path to file containing GitHub data as produced by the `github.py` fetcher
     """
-    calendar_data = munge_calendar_data(calendar_data_file, datetime.datetime.now() - datetime.timedelta(days=60), datetime.datetime.now(), "simeon.carstens@tweag.io")
+    calendar_data = munge_calendar_data(calendar_data_file, datetime.datetime.now() - datetime.timedelta(days=60), datetime.datetime.now(), email)
     github_data = munge_github_data(github_data_file)
 
     res = model_invocation_fn(PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data))
@@ -85,6 +85,7 @@ def main(calendar_data_file: str, github_data_file: str, model_invocation_fn: Ca
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate a summary of your work week")
     parser.add_argument("--calendar-data", type=str, help="Path to the calendar .ics file", required=True)
+    parser.add_argument("--email", type=str, help="Email address to use when filtering calendar events", required=True)
     parser.add_argument("--github-data", type=str, help="Path to the GitHub data file", required=True)
     parser.add_argument("--model", type=str, choices=["jurassic2", "llama2", "claude3"], default="claude3", help="Model to use for summary generation")
     args = parser.parse_args()
@@ -102,4 +103,4 @@ if __name__ == "__main__":
             # should never occur due to the choices limitation in the argument parser
             raise ValueError("Invalid model")
 
-    main(args.calendar_data, args.github_data, model_invocation_fn)
+    main(args.calendar_data, args.email, args.github_data, model_invocation_fn)
