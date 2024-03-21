@@ -1,7 +1,9 @@
+import argparse
 import datetime
 import json
 import os
 from pickle import dump, load
+from typing import Callable
 
 from .bedrock import init_client, invoke_claude3, invoke_llama2, invoke_jurassic2
 from .fetchers.google_calendar import format_events
@@ -66,19 +68,32 @@ def munge_github_data(file_path: str) -> str:
 
     return json.dumps(github_data)
 
-def main():
-    github_data = munge_github_data("github_data.json")
-    calendar_data = munge_calendar_data("calendar.ics", datetime.datetime.now() - datetime.timedelta(days=60), datetime.datetime.now(), "simeon.carstens@tweag.io")
-    runtime_client = init_client('bedrock-runtime', 'us-east-1')
+def main(calendar_data_file: str, github_data_file: str, model_invocation_fn: Callable[[str], str]):
+    calendar_data = munge_calendar_data(calendar_data_file, datetime.datetime.now() - datetime.timedelta(days=60), datetime.datetime.now(), "simeon.carstens@tweag.io")
+    github_data = munge_github_data(github_data_file)
 
-    # res = invoke_llama2(runtime_client, model_id=model_name, prompt=PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data))
-    # res = invoke_jurassic2(runtime_client, model_id=model_name, prompt=PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data))
-    res = invoke_claude3(
-        runtime_client,
-        prompt=PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data)
-    )
+    res = model_invocation_fn(PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data))
     print(res)
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Generate a summary of your work week")
+    parser.add_argument("--calendar-data", type=str, help="Path to the calendar data file", required=True)
+    parser.add_argument("--github-data", type=str, help="Path to the GitHub data file", required=True)
+    parser.add_argument("--model", type=str, choices=["jurassic2", "llama2", "claude3"], default="claude3", help="Model to use for summary generation")
+    args = parser.parse_args()
+
+    runtime_client = init_client('bedrock-runtime', 'us-east-1')
+
+    match args.model:
+        case "jurassic2":
+            model_invocation_fn = lambda prompt: invoke_jurassic2(runtime_client, prompt=prompt)
+        case "llama2":
+            model_invocation_fn = lambda prompt: invoke_llama2(runtime_client, prompt=prompt)
+        case "claude3":
+            model_invocation_fn = lambda prompt: invoke_claude3(runtime_client, prompt=prompt)
+        case _:
+            # should never occur due to the choices limitation in the argument parser
+            raise ValueError("Invalid model")
+
+    main(args.calendar_data, args.github_data, model_invocation_fn)
