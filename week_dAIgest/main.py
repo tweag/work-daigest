@@ -71,10 +71,6 @@ calendar_data = munge_calendar_data("calendar.ics", datetime.datetime.now() - da
 
 runtime_client = init_client('bedrock-runtime', 'us-east-1')
 
-
-model_name = "meta.llama2-70b-chat-v1"
-#model_name = "ai21.j2-jumbo-instruct"
-
 # res = invoke_llama2(runtime_client, model_id=model_name, prompt=PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data))
 # res = invoke_jurassic2(runtime_client, model_id=model_name, prompt=PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data))
 res = invoke_claude3(
