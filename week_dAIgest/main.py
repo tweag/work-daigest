@@ -69,6 +69,12 @@ def munge_github_data(file_path: str) -> str:
     return json.dumps(github_data)
 
 def main(calendar_data_file: str, github_data_file: str, model_invocation_fn: Callable[[str], str]):
+    """
+    Main program flow.
+
+    :param calendar_data_file: Path to file containing calendar data as produced by the `google_calendar.py` fetcher
+    :param github_data_file: Path to file containing GitHub data as produced by the `github.py` fetcher
+    """
     calendar_data = munge_calendar_data(calendar_data_file, datetime.datetime.now() - datetime.timedelta(days=60), datetime.datetime.now(), "simeon.carstens@tweag.io")
     github_data = munge_github_data(github_data_file)
 
