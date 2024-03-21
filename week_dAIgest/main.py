@@ -72,7 +72,7 @@ def main(calendar_data_file: str, github_data_file: str, model_invocation_fn: Ca
     """
     Main program flow.
 
-    :param calendar_data_file: Path to file containing calendar data as produced by the `google_calendar.py` fetcher
+    :param calendar_data_file: Path to .ics file containing calendar data
     :param github_data_file: Path to file containing GitHub data as produced by the `github.py` fetcher
     """
     calendar_data = munge_calendar_data(calendar_data_file, datetime.datetime.now() - datetime.timedelta(days=60), datetime.datetime.now(), "simeon.carstens@tweag.io")
@@ -84,7 +84,7 @@ def main(calendar_data_file: str, github_data_file: str, model_invocation_fn: Ca
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate a summary of your work week")
-    parser.add_argument("--calendar-data", type=str, help="Path to the calendar data file", required=True)
+    parser.add_argument("--calendar-data", type=str, help="Path to the calendar .ics file", required=True)
     parser.add_argument("--github-data", type=str, help="Path to the GitHub data file", required=True)
     parser.add_argument("--model", type=str, choices=["jurassic2", "llama2", "claude3"], default="claude3", help="Model to use for summary generation")
     args = parser.parse_args()
