@@ -11,7 +11,6 @@ from .fetchers.google_calendar import format_events
 from ics import Calendar
 
 PROMPT_TEMPLATE = """
-    My name is Simeon Carstens and I am a software engineer at Tweag.
     Summarize the events in the calendar and my work on GitHub and tell me what I did this week.
     If the event has a description, include a summary.
     Include attendees names.
