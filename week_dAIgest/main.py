@@ -8,8 +8,6 @@ from .fetchers.google_calendar import format_events
 
 from ics import Calendar
 
-model_name = "meta.llama2-70b-chat-v1"
-#model_name = "ai21.j2-jumbo-instruct"
 PROMPT_TEMPLATE = """
     My name is Simeon Carstens and I am a software engineer at Tweag.
     Summarize the events in the calendar and my work on GitHub and tell me what I did this week.
@@ -74,9 +72,11 @@ calendar_data = munge_calendar_data("calendar.ics", datetime.datetime.now() - da
 runtime_client = init_client('bedrock-runtime', 'us-east-1')
 
 
+model_name = "meta.llama2-70b-chat-v1"
+#model_name = "ai21.j2-jumbo-instruct"
 
-# res = invoke_llama2(runtime_client, model_id=model_name, prompt=prompt_template)
-# res = invoke_jurassic2(runtime_client, jurassic_model=model_name, prompt=prompt_template)
+# res = invoke_llama2(runtime_client, model_id=model_name, prompt=PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data))
+# res = invoke_jurassic2(runtime_client, model_id=model_name, prompt=PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data))
 res = invoke_claude3(
     runtime_client,
     prompt=PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data)
