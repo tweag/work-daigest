@@ -14,7 +14,7 @@ Right now, supported data sources are GitHub and Google Calendar.
 
 ### GitHub data
 
-To get the GitHub data (issues, PRs, commits) in the expected format, use the GitHub fetcher in `weekly_dAIgest/fetchers/github.py`, following instructions in TODO [GitHub fetcher README].
+To get the GitHub data (issues, PRs, commits) in the expected format, use the GitHub fetcher in `weekly_dAIgest/fetchers/github.py`, following instructions in the [fetchers README](weekly_dAIgest/fetchers/README.md).
 
 ### Google Calendar data
 
