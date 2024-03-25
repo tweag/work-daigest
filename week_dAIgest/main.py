@@ -1,5 +1,6 @@
 import argparse
 import datetime
+import functools
 import json
 import os
 import pathlib
@@ -83,11 +84,11 @@ def main():
 
     match args.model:
         case "jurassic2":
-            model_invocation_fn = lambda prompt: invoke_jurassic2(runtime_client, prompt=prompt)
+            model_invocation_fn = functools.partial(invoke_jurassic2, client=runtime_client)
         case "llama2":
-            model_invocation_fn = lambda prompt: invoke_llama2(runtime_client, prompt=prompt)
+            model_invocation_fn = functools.partial(invoke_llama2, client=runtime_client)
         case "claude3":
-            model_invocation_fn = lambda prompt: invoke_claude3(runtime_client, prompt=prompt)
+            model_invocation_fn = functools.partial(invoke_claude3, client=runtime_client)
         case _:
             # should never occur due to the choices limitation in the argument parser
             raise ValueError("Invalid model")
@@ -95,7 +96,7 @@ def main():
     calendar_data = munge_calendar_data(args.calendar_data, datetime.datetime.now() - datetime.timedelta(days=60), datetime.datetime.now(), args.email)
     github_data = munge_github_data(args.github_data)
 
-    res = model_invocation_fn(PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data))
+    res = model_invocation_fn(prompt=PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data))
     print(res)
 
 
