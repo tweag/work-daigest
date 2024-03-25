@@ -1,7 +1,7 @@
 # Summarize your work week using LLMs
 
-This project came into existence as part of an Tweag-internal hackathon on GenAI topics.
-The goal is to summarize your work week using data from multiple work-related source, such as
+This project came into existence as part of a Tweag-internal hackathon on GenAI topics.
+The goal is to summarize your work week using data from multiple work-related sources, such as
 - GitHub,
 - Google Calendar,
 - Slack,
