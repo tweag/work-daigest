@@ -2,6 +2,7 @@ import argparse
 import datetime
 import json
 import os
+import pathlib
 from pickle import dump, load
 from typing import Callable
 
@@ -72,9 +73,9 @@ def main():
     Main program flow.
     """
     parser = argparse.ArgumentParser(description="Generate a summary of your work week")
-    parser.add_argument("--calendar-data", type=str, help="Path to the calendar .ics file", required=True)
+    parser.add_argument("--calendar-data", type=pathlib.Path, help="Path to the calendar .ics file", required=True)
     parser.add_argument("--email", type=str, help="Email address to use when filtering calendar events", required=True)
-    parser.add_argument("--github-data", type=str, help="Path to the GitHub data file", required=True)
+    parser.add_argument("--github-data", type=pathlib.Path, help="Path to the GitHub data file", required=True)
     parser.add_argument("--model", type=str, choices=["jurassic2", "llama2", "claude3"], default="claude3", help="Model to use for summary generation")
     args = parser.parse_args()
 
