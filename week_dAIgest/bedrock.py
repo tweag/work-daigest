@@ -55,7 +55,7 @@ def invoke_jurassic2(client, prompt: str, model_id: str = "ai21.j2-jumbo-instruc
         raise
 
 
-def invoke_llama2(client, model_id: str, prompt: str) -> str:
+def invoke_llama2(client, prompt: str, model_id: str = "meta.llama2-70b-chat-v1") -> str:
     """
     Invokes the Meta Llama 2 large-language model to run an inference
     using the input provided in the request body.

@@ -22,17 +22,14 @@ setuptools = "^68.2.2"
 requests = "^2.31.0"
 boto3 = "^1.34.37"
 
+[tool.poetry.scripts]
+weekly-dAIgest = "week_dAIgest:main.main"
+
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
 isort = "^5.12.0"
 ruff = "^0.0.290"
 fawltydeps = "^0.13.1"
-
-[tool.poetry.group.notebook.dependencies]
-jupyter = "^1.0.0"
-notebook = "^7.0.4"
-pandas = ">=2.0.1, <3.0.0"
-
 
 [tool.isort]
 profile = "black"
