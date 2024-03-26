@@ -26,7 +26,7 @@ boto3 = "^1.34.37"
 weekly-dAIgest = "week_dAIgest:main.main"
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.9.1"
+black = "^24.3.0"
 isort = "^5.12.0"
 ruff = "^0.0.290"
 fawltydeps = "^0.13.1"
