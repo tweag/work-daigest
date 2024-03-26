@@ -21,6 +21,7 @@ ics = "^0.7.2"
 setuptools = "^68.2.2"
 requests = "^2.31.0"
 boto3 = "^1.34.37"
+pytz = "^2024.1"
 
 [tool.poetry.scripts]
 weekly-dAIgest = "week_dAIgest:main.main"
