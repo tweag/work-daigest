@@ -20,16 +20,14 @@ def extract_formatted_events(calendar_file, d1, d2, email):
 def format_events(calendar: Calendar, start: datetime, end: datetime, email):
     events = calendar.events
     events = [e for e in events if e.begin >= start and e.end <= end]
-    go_to_next = False
     all_events = []
+    is_valid_attendee = lambda att: att.email == email and (att.partstat not in ("DECLINED", "NEEDS-ACTION"))
+
     for e in events:
         event_text = []
-        for att in e.attendees:
-            if att.email == email and att.partstat == "DECLINED" or att.partstat == "NEEDS-ACTION":
-                go_to_next = True
-        if go_to_next:
-            go_to_next = False
+        if not any(map(is_valid_attendee, e.attendees)):
             continue
+
         event_text.append(e.name)
 
         event_text.append(f"duration: {e.duration}")
