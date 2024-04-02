@@ -7,6 +7,8 @@ import pathlib
 from pickle import dump, load
 from typing import Callable
 
+import pytz
+
 from .bedrock import init_client, invoke_claude3, invoke_llama2, invoke_jurassic2
 from .fetchers.google_calendar import format_events
 
@@ -50,7 +52,8 @@ def munge_calendar_data(file_path: str, min_date: datetime.datetime, max_date: d
         with open(file_path, 'r') as f:
             calendar = Calendar(f.read())
 
-        cal_text = format_events(calendar, min_date, max_date, email)
+        utc = pytz.UTC
+        cal_text = format_events(calendar, utc.localize(min_date), utc.localize(max_date), email)
         with open(CACHE_FILE, "wb") as f:
             dump(cal_text, f)
 
