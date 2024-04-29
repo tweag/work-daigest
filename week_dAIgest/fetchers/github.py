@@ -27,8 +27,6 @@ def to_github_datetime_format(dt: datetime.datetime) -> str:
     return dt.isoformat()[:-7] + "Z"
 
 BASE_URL = "https://api.github.com/search"
-DATETIME_LOWER_BOUND = (datetime.datetime.now() - datetime.timedelta(days=31))
-DATETIME_UPPER_BOUND = datetime.datetime.now()
 
 HEADERS = {
     "Accept": "application/vnd.github.v3+json",
@@ -57,12 +55,12 @@ def get_latest_action(comment_json: dict) -> (str, str):
     return actions[-1]
 
 
-def fetch_issues(handle: str) -> list[GitHubComment]:
+def fetch_issues(handle: str, lower_date: datetime.datetime, upper_date: datetime.datetime) -> list[GitHubComment]:
     """
     Fetch all GitHub issues authored by user `handle`
     """
     # TODO: could also try to use "updated_at" or "closed_at" fields
-    datetime_filter = f"created:{to_github_datetime_format(DATETIME_LOWER_BOUND)}..{to_github_datetime_format(DATETIME_UPPER_BOUND)}"
+    datetime_filter = f"created:{to_github_datetime_format(lower_date)}..{to_github_datetime_format(upper_date)}"
     response = send_query(f"{BASE_URL}/issues", f"is:issue+author:{handle}+{datetime_filter}")
     all_comments = []
     for comment_json in response["items"]:
@@ -79,12 +77,12 @@ def fetch_issues(handle: str) -> list[GitHubComment]:
         )
     return all_comments
 
-def fetch_prs(handle: str) -> list[GitHubComment]:
+def fetch_prs(handle: str, lower_date: datetime.datetime, upper_date: datetime.datetime) -> list[GitHubComment]:
     """
     Fetch all GitHub pull requests authored by user `handle`
     """
     # TODO: could also try to use "updated_at" or "closed_at" fields
-    datetime_filter = f"created:{to_github_datetime_format(DATETIME_LOWER_BOUND)}..{to_github_datetime_format(DATETIME_UPPER_BOUND)}"
+    datetime_filter = f"created:{to_github_datetime_format(lower_date)}..{to_github_datetime_format(upper_date)}"
     response = send_query(f"{BASE_URL}/issues", f"is:pull-request+author:{handle}+{datetime_filter}")
     all_comments = []
     for comment_json in response["items"]:
@@ -101,11 +99,11 @@ def fetch_prs(handle: str) -> list[GitHubComment]:
         )
     return all_comments
 
-def fetch_commits(handle: str) -> list[GitHubComment]:
+def fetch_commits(handle: str, lower_date: datetime.datetime, upper_date: datetime.datetime) -> list[GitHubComment]:
     """
     Fetch all GitHub commits authored by user `handle`
     """
-    datetime_filter = f"author-date:{to_github_datetime_format(DATETIME_LOWER_BOUND)}..{to_github_datetime_format(DATETIME_UPPER_BOUND)}"
+    datetime_filter = f"author-date:{to_github_datetime_format(lower_date)}..{to_github_datetime_format(upper_date)}"
     response = send_query(f"{BASE_URL}/commits", f"author:{handle}+committer:{handle}+{datetime_filter}")
     return [
         GitHubComment(
@@ -118,18 +116,21 @@ def fetch_commits(handle: str) -> list[GitHubComment]:
     ]
 
 
-def fetch_comments(handle: str) -> list[GitHubComment]:
+def fetch_comments(handle: str, lower_date: datetime.datetime, upper_date: datetime.datetime) -> list[GitHubComment]:
     """
     Fetch all GitHub comments authored by user `handle`
     """
     all_comments = []
-    all_comments.append(fetch_issues(handle))
-    all_comments.append(fetch_prs(handle))
-    all_comments.append(fetch_commits(handle))
+    all_comments.append(fetch_issues(handle, lower_date, upper_date))
+    all_comments.append(fetch_prs(handle, lower_date, upper_date))
+    all_comments.append(fetch_commits(handle, lower_date, upper_date))
     return all_comments
 
 if __name__ == "__main__":
-    comments = fetch_comments("simeoncarstens")
+    lower_date = datetime.datetime.now() - datetime.timedelta(days=7)
+    upper_date = datetime.datetime.now()
+
+    comments = fetch_comments("simeoncarstens", lower_date, upper_date)
     # Flatten list: why does this work? https://stackoverflow.com/a/952946/1656472
     # Tweag style!
     comments = sum(comments, [])

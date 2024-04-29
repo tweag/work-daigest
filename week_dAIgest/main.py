@@ -11,6 +11,7 @@ import pytz
 
 from .bedrock import init_client, invoke_claude3, invoke_llama2, invoke_jurassic2
 from .fetchers.google_calendar import format_events
+from .fetchers.github import fetch_comments
 
 from ics import Calendar
 
@@ -78,8 +79,8 @@ def main():
     """
     parser = argparse.ArgumentParser(description="Generate a summary of your work week")
     parser.add_argument("--calendar-data", type=pathlib.Path, help="Path to the calendar .ics file", required=True)
+    parser.add_argument("--github-handle", type=str, help="GitHub handle to use when fetching GitHub data", required=True)
     parser.add_argument("--email", type=str, help="Email address to use when filtering calendar events", required=True)
-    parser.add_argument("--github-data", type=pathlib.Path, help="Path to the GitHub data file", required=True)
     parser.add_argument("--model", type=str, choices=["jurassic2", "llama2", "claude3"], default="claude3", help="Model to use for summary generation")
     args = parser.parse_args()
 
@@ -96,8 +97,10 @@ def main():
             # should never occur due to the choices limitation in the argument parser
             raise ValueError("Invalid model")
 
-    calendar_data = munge_calendar_data(args.calendar_data, datetime.datetime.now() - datetime.timedelta(days=60), datetime.datetime.now(), args.email)
-    github_data = munge_github_data(args.github_data)
+    lower_date = datetime.datetime.now() - datetime.timedelta(days=7)
+    upper_date = datetime.datetime.now()
+    calendar_data = munge_calendar_data(args.calendar_data, lower_date, upper_date, args.email)
+    github_data = fetch_comments(args.github_handle, lower_date, upper_date)
 
     res = model_invocation_fn(prompt=PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data))
     print(res)

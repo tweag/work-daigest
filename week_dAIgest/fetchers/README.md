@@ -15,7 +15,7 @@ Run it like so:
 $ GITHUB_TOKEN=<token> python github.py > github_data.json
 ```
 
-This will produce a file `github_data.json` which can be consumed by the main application's `--github-data` argument.
+This will produce a file `github_data.json`. The GitHub data is retrieved automatically in the main program, but these instructions allow you to inspect the retrieved data.
 
 ## Google Calendar
 
