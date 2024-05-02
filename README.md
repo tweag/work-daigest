@@ -37,7 +37,7 @@ Then, you can just run `poetry install` to install the application and all requi
 Run `weekly-dAIgest --help` to learn about the supported command line arguments:
 ```console
 $ GITHUB_TOKEN=<your GitHub token> weekly-dAIgest --help
-usage: weekly-dAIgest [-h] --calendar-data CALENDAR_DATA --github-handle GITHUB_HANDLE --email EMAIL
+usage: weekly-dAIgest [-h] --calendar-data CALENDAR_DATA --github-handle GITHUB_HANDLE --email EMAIL [--lower-date LOWER_DATE] [--upper-date UPPER_DATE]
                       [--model {jurassic2,llama2,claude3}]
 
 Generate a summary of your work week
@@ -49,6 +49,10 @@ options:
   --github-handle GITHUB_HANDLE
                         GitHub handle to use when fetching GitHub data
   --email EMAIL         Email address to use when filtering calendar events
+  --lower-date LOWER_DATE
+                        Lower date limit to consider data for, in the format YYYY-MM-DD. Defaults to today - 7 days.
+  --upper-date UPPER_DATE
+                        Upper date limit to consider data for, in the format YYYY-MM-DD. Defaults to today.
   --model {jurassic2,llama2,claude3}
                         Model to use for summary generation
 ```

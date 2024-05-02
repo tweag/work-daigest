@@ -5,15 +5,13 @@ import json
 import os
 import pathlib
 from pickle import dump, load
-from typing import Callable
 
+from ics import Calendar
 import pytz
 
 from .bedrock import init_client, invoke_claude3, invoke_llama2, invoke_jurassic2
 from .fetchers.google_calendar import format_events
 from .fetchers.github import fetch_comments
-
-from ics import Calendar
 
 PROMPT_TEMPLATE = """
     Summarize the events in the calendar and my work on GitHub and tell me what I did this week.
@@ -73,6 +71,15 @@ def munge_github_data(file_path: str) -> str:
 
     return json.dumps(github_data)
 
+def convert_to_datetime(datestr: str) -> datetime.datetime:
+    """
+    Convert a date string of the format YYYY-MM-DD to a datetime object
+    and augment with one milliseconds to make it compatible with the GitHub
+    API.
+    """
+    return datetime.datetime.strptime(datestr, "%Y-%m-%d").replace(microsecond=1)
+
+
 def main():
     """
     Main program flow.
@@ -81,6 +88,8 @@ def main():
     parser.add_argument("--calendar-data", type=pathlib.Path, help="Path to the calendar .ics file", required=True)
     parser.add_argument("--github-handle", type=str, help="GitHub handle to use when fetching GitHub data", required=True)
     parser.add_argument("--email", type=str, help="Email address to use when filtering calendar events", required=True)
+    parser.add_argument("--lower-date", type=convert_to_datetime, help="Lower date limit to consider data for, in the format YYYY-MM-DD. Defaults to today - 7 days.", default=(datetime.datetime.today() - datetime.timedelta(days=7)).strftime("%Y-%m-%d"))
+    parser.add_argument("--upper-date", type=convert_to_datetime, help="Upper date limit to consider data for, in the format YYYY-MM-DD. Defaults to today.", default=datetime.datetime.now().strftime("%Y-%m-%d"))
     parser.add_argument("--model", type=str, choices=["jurassic2", "llama2", "claude3"], default="claude3", help="Model to use for summary generation")
     args = parser.parse_args()
 
@@ -97,10 +106,8 @@ def main():
             # should never occur due to the choices limitation in the argument parser
             raise ValueError("Invalid model")
 
-    lower_date = datetime.datetime.now() - datetime.timedelta(days=7)
-    upper_date = datetime.datetime.now()
-    calendar_data = munge_calendar_data(args.calendar_data, lower_date, upper_date, args.email)
-    github_data = fetch_comments(args.github_handle, lower_date, upper_date)
+    calendar_data = munge_calendar_data(args.calendar_data, args.lower_date, args.upper_date, args.email)
+    github_data = fetch_comments(args.github_handle, args.lower_date, args.upper_date)
 
     res = model_invocation_fn(prompt=PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data))
     print(res)
