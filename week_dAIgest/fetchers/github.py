@@ -34,16 +34,47 @@ HEADERS = {
 if token := os.getenv("GITHUB_TOKEN"):
     HEADERS["Authorization"] = f"token {token}"
 
-def send_query(url: str, query: str) -> dict:
+def extract_next_page_link_from_header(link_header: str) -> str | None:
     """
-    Send a query to the GitHub API and return the JSON response
+    Extract the URL of the next page of results from the "Link" header
     """
-    response = requests.get(
-        f"{url}?q={query}&per_page=100",
-        headers=HEADERS
-    )
-    response.raise_for_status()
-    return response.json()
+    # The "link" header contains a comma-separated list of links, each with a
+    # "rel" attribute (separated from the link by a semicolon and a space) that
+    # describes the relationship of the link to the current page of results.
+    # We're interested in the "rel=next" link.
+    # If there is no "rel=next" link, we're done.
+    links = link_header.split(", ")
+    for link in links:
+        url, rel = link.split("; ")
+        if rel == 'rel="next"':
+            # The URL is enclosed in angle brackets, so we strip those off
+            return url.lstrip("<").rstrip(">")
+    return None
+
+def send_query(url: str, query: str) -> list[dict]:
+    """
+    Send a query to the GitHub API and return the `items` field of the response
+    """
+    items = []
+    current_url = f"{url}?q={query}&per_page=30"
+    while current_url:
+        # The GitHub Search API uses pagination, so we need to fetch multiple
+        # pages of results. The current page to fetch is determined by the
+        # `current_url` variable.
+        response = requests.get(current_url, headers=HEADERS)
+        response.raise_for_status()
+        items.extend(response.json()["items"])
+
+        # Pagination: GitHub API responses contain a "link" header that
+        # contains links to the next page of results. If there is no "link"
+        # header, we're done.
+        if "link" not in response.headers:
+            break
+        # If there is a "link" header, extract the URL of the next page of
+        # results.
+        current_url = extract_next_page_link_from_header(response.headers["link"])
+
+    return items
 
 def get_latest_action(comment_json: dict) -> (str, str):
     min_date = "1970-01-01T00:00:00Z"
@@ -61,9 +92,9 @@ def fetch_issues(handle: str, lower_date: datetime.datetime, upper_date: datetim
     """
     # TODO: could also try to use "updated_at" or "closed_at" fields
     datetime_filter = f"created:{to_github_datetime_format(lower_date)}..{to_github_datetime_format(upper_date)}"
-    response = send_query(f"{BASE_URL}/issues", f"is:issue+author:{handle}+{datetime_filter}")
+    response_items = send_query(f"{BASE_URL}/issues", f"is:issue+author:{handle}+{datetime_filter}")
     all_comments = []
-    for comment_json in response["items"]:
+    for comment_json in response_items:
         latest_action, date = get_latest_action(comment_json)
         all_comments.append(
             GitHubComment(
@@ -83,9 +114,9 @@ def fetch_prs(handle: str, lower_date: datetime.datetime, upper_date: datetime.d
     """
     # TODO: could also try to use "updated_at" or "closed_at" fields
     datetime_filter = f"created:{to_github_datetime_format(lower_date)}..{to_github_datetime_format(upper_date)}"
-    response = send_query(f"{BASE_URL}/issues", f"is:pull-request+author:{handle}+{datetime_filter}")
+    response_items = send_query(f"{BASE_URL}/issues", f"is:pull-request+author:{handle}+{datetime_filter}")
     all_comments = []
-    for comment_json in response["items"]:
+    for comment_json in response_items:
         latest_action, date = get_latest_action(comment_json)
         all_comments.append(
             GitHubComment(
@@ -104,7 +135,7 @@ def fetch_commits(handle: str, lower_date: datetime.datetime, upper_date: dateti
     Fetch all GitHub commits authored by user `handle`
     """
     datetime_filter = f"author-date:{to_github_datetime_format(lower_date)}..{to_github_datetime_format(upper_date)}"
-    response = send_query(f"{BASE_URL}/commits", f"author:{handle}+committer:{handle}+{datetime_filter}")
+    response_items = send_query(f"{BASE_URL}/commits", f"author:{handle}+committer:{handle}+{datetime_filter}")
     return [
         GitHubComment(
             dateutil.parser.parse(comment_json["commit"]["author"]["date"]),
@@ -112,7 +143,7 @@ def fetch_commits(handle: str, lower_date: datetime.datetime, upper_date: dateti
             RepositoryName(comment_json["repository"]["full_name"]),
             "committed"
         )
-        for comment_json in response["items"]
+        for comment_json in response_items
     ]
 
 
