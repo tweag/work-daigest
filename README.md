@@ -1,7 +1,7 @@
-# Summarize your work week using LLMs
+# Summarize your work using a LLM
 
 This project came into existence as part of a Tweag-internal hackathon on GenAI topics.
-The goal is to summarize your work week using data from multiple work-related sources, such as
+The goal is to summarize your work using data from multiple work-related sources, such as
 - GitHub,
 - Google Calendar,
 - Slack,
@@ -14,7 +14,7 @@ Right now, supported data sources are GitHub and Google Calendar.
 
 ### GitHub data
 
-GitHub data (issues, PRs, commits) is retrieved automatically using the code in `weekly_dAIgest/fetchers/github.py`, but follow instructions in the [fetchers README](weekly_dAIgest/fetchers/README.md) of you'd like to manually fetch the data and inspect it.
+GitHub data (issues, PRs, commits) is retrieved automatically using the code in `work_daigest/fetchers/github.py`, but follow instructions in the [fetchers README](work_daigest/fetchers/README.md) of you'd like to manually fetch the data and inspect it.
 
 ### Google Calendar data
 
@@ -34,13 +34,13 @@ To get started, install the program in a virtual environment using `nix-shell` i
 If you're not, you'll have to have [Poetry](https://python-poetry.org/) installed.
 Then, you can just run `poetry install` to install the application and all required dependencies and you're ready to go.
 
-Run `weekly-dAIgest --help` to learn about the supported command line arguments:
+Run `work-daigest --help` to learn about the supported command line arguments:
 ```console
-$ GITHUB_TOKEN=<your GitHub token> weekly-dAIgest --help
-usage: weekly-dAIgest [-h] --calendar-data CALENDAR_DATA --github-handle GITHUB_HANDLE --email EMAIL [--lower-date LOWER_DATE] [--upper-date UPPER_DATE]
-                      [--model {jurassic2,llama2,claude3}]
+$ GITHUB_TOKEN=<your GitHub token> work-daigest --help
+usage: work-daigest [-h] --calendar-data CALENDAR_DATA --github-handle GITHUB_HANDLE --email EMAIL [--lower-date LOWER_DATE] [--upper-date UPPER_DATE]
+                    [--model {jurassic2,llama2,claude3}]
 
-Generate a summary of your work week
+Generate a summary of your work
 
 options:
   -h, --help            show this help message and exit
