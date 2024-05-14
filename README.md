@@ -24,15 +24,16 @@ This downloads a zipped `.ics` file, which you will have to unpack.
 
 ## Usage
 
+To get started, install the program in a virtual environment using `nix-shell` if you're a Nix person.
+If you're not, you'll have to have [Poetry](https://python-poetry.org/) installed.
+Then, you can just run `poetry install` to install the application and all required dependencies and you're ready to go.
+
 Note that the application currently calls out to [AWS Bedrock](https://aws.amazon.com/bedrock/) for LLM access.
 So you'll have to enable the relevant models (default is Claude-3 Sonnet) in Bedrock and make sure that you have AWS credentials with all necessary permissions set up, for example using `aws sso configure` and `aws sso login`.
 Don't forget to set the `AWS_PROFILE` environment variable to your AWS profile name if it's not the default.
 The program expects a (classic) GitHub personal token in the environment variable `GITHUB_TOKEN`.
 That token needs to have the full `repo` OAuth scopes.
 
-To get started, install the program in a virtual environment using `nix-shell` if you're a Nix person.
-If you're not, you'll have to have [Poetry](https://python-poetry.org/) installed.
-Then, you can just run `poetry install` to install the application and all required dependencies and you're ready to go.
 
 Run `work-daigest --help` to learn about the supported command line arguments:
 ```console
