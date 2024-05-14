@@ -43,19 +43,11 @@ def munge_calendar_data(file_path: str, min_date: datetime.datetime, max_date: d
     :param email: Email to filter calendar events.
     :return: Munged calendar data.
     """
-    # Cache munged calendar data
-    CACHE_FILE = "caldump.pickle"
-    if os.path.exists(CACHE_FILE):
-        with open(CACHE_FILE, "rb") as f:
-            events = load(f)
-    else:
-        with open(file_path, 'r') as f:
-            calendar = Calendar(f.read())
+    with open(file_path, 'r') as f:
+        calendar = Calendar(f.read())
 
-        utc = pytz.UTC
-        events = filter_events(calendar, utc.localize(min_date), utc.localize(max_date), email)
-        with open(CACHE_FILE, "wb") as f:
-            dump(events, f)
+    utc = pytz.UTC
+    events = filter_events(calendar, utc.localize(min_date), utc.localize(max_date), email)
 
     return events
 
