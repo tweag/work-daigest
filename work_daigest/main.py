@@ -2,13 +2,12 @@ import argparse
 import datetime
 import functools
 import json
-import os
 import pathlib
-from pickle import dump, load
-from typing import List
+from typing import List, Union
 
 import pytz
 from ics import Calendar
+from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 from .bedrock import init_client, invoke_claude3, invoke_jurassic2, invoke_llama2
 from .fetchers.github import fetch_comments
@@ -33,18 +32,24 @@ PROMPT_TEMPLATE = """
     ```
     """
 
-def munge_calendar_data(file_path: str, min_date: datetime.datetime, max_date: datetime.datetime, email: str) -> List[str]:
+def munge_calendar_data(cal_file: Union[str, UploadedFile], min_date: datetime.datetime, max_date: datetime.datetime, email: str) -> List[str]:
     """
     Munge calendar data to be used in the prompt template.
 
-    :param file_path: Path to the calendar file.
+    :param cal_file: Path to the calendar file or uploaded file.
     :param min_date: Minimum date to consider.
     :param max_date: Maximum date to consider.
     :param email: Email to filter calendar events.
     :return: Munged calendar data.
     """
-    with open(file_path, 'r') as f:
-        calendar = Calendar(f.read())
+    if isinstance(cal_file, UploadedFile):
+        file_content = cal_file.getvalue().decode("utf-8")
+    elif isinstance(cal_file, str):
+        with open(cal_file, 'r') as f:
+            file_content = f.read()
+    else:
+        raise ValueError(f"Invalid file type: {type(file_path)}")
+    calendar = Calendar(file_content)
 
     utc = pytz.UTC
     events = filter_events(calendar, utc.localize(min_date), utc.localize(max_date), email)
