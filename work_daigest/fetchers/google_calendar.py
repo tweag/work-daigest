@@ -1,6 +1,8 @@
-from ics import Calendar
 import re
 from datetime import datetime
+
+from ics import Calendar
+
 
 def remove_text_pattern(description):
     pattern = r"-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-[\s\S]+-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-"
