@@ -6,12 +6,12 @@ import os
 import pathlib
 from pickle import dump, load
 
-from ics import Calendar
 import pytz
+from ics import Calendar
 
-from .bedrock import init_client, invoke_claude3, invoke_llama2, invoke_jurassic2
-from .fetchers.google_calendar import format_events
+from .bedrock import init_client, invoke_claude3, invoke_jurassic2, invoke_llama2
 from .fetchers.github import fetch_comments
+from .fetchers.google_calendar import format_events
 
 PROMPT_TEMPLATE = """
     Summarize the events in the calendar and my work on GitHub and tell me what I did during the covered period of time.
@@ -80,6 +80,25 @@ def convert_to_datetime(datestr: str) -> datetime.datetime:
     return datetime.datetime.strptime(datestr, "%Y-%m-%d").replace(microsecond=1)
 
 
+def process_data(calendar_file, github_handle, email, lower_date, upper_date, model_choice):
+    runtime_client = init_client('bedrock-runtime', 'us-east-1')
+    model_functions = {
+        "jurassic2": functools.partial(invoke_jurassic2, client=runtime_client),
+        "llama2": functools.partial(invoke_llama2, client=runtime_client),
+        "claude3": functools.partial(invoke_claude3, client=runtime_client)
+    }
+    
+    model_fn = model_functions.get(model_choice)
+
+    if model_fn is None:
+        raise ValueError(f"Invalid model choice: {model_choice}. Choose from {model_functions.keys()}.")
+        
+    calendar_data = munge_calendar_data(calendar_file, lower_date, upper_date, email)
+    github_data = fetch_comments(github_handle, lower_date, upper_date)
+    
+    return model_fn, calendar_data, github_data
+
+
 def main():
     """
     Main program flow.
@@ -92,25 +111,11 @@ def main():
     parser.add_argument("--upper-date", type=convert_to_datetime, help="Upper date limit to consider data for, in the format YYYY-MM-DD. Defaults to today.", default=datetime.datetime.now().strftime("%Y-%m-%d"))
     parser.add_argument("--model", type=str, choices=["jurassic2", "llama2", "claude3"], default="claude3", help="Model to use for summary generation")
     args = parser.parse_args()
+    
+    model_fn, calendar_data, github_data = process_data(args.calendar_data, args.github_handle, args.email, args.lower_date, args.upper_date, args.model)
+    summary = model_fn(prompt=PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data))
 
-    runtime_client = init_client('bedrock-runtime', 'us-east-1')
-
-    match args.model:
-        case "jurassic2":
-            model_invocation_fn = functools.partial(invoke_jurassic2, client=runtime_client)
-        case "llama2":
-            model_invocation_fn = functools.partial(invoke_llama2, client=runtime_client)
-        case "claude3":
-            model_invocation_fn = functools.partial(invoke_claude3, client=runtime_client)
-        case _:
-            # should never occur due to the choices limitation in the argument parser
-            raise ValueError("Invalid model")
-
-    calendar_data = munge_calendar_data(args.calendar_data, args.lower_date, args.upper_date, args.email)
-    github_data = fetch_comments(args.github_handle, args.lower_date, args.upper_date)
-
-    res = model_invocation_fn(prompt=PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data))
-    print(res)
+    print(summary)
 
 
 if __name__ == "__main__":
