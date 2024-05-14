@@ -1,6 +1,6 @@
 { pkgs ? import (builtins.fetchTarball {
-  url = "https://github.com/NixOS/nixpkgs/archive/release-23.11.tar.gz";
-  sha256 = "0x4s7g24mwkhf205d0dwmgcqr2jglkffn8xicwmab3crkfdr4cqh";
+    url = "https://github.com/NixOS/nixpkgs/archive/refs/tags/23.11.tar.gz";
+    sha256 = "1ndiv385w1qyb3b18vw13991fzb9wg4cl21wglk89grsfsnra41k";
 }) { } }:
 pkgs.mkShell {
   name = "work-daigest-env";
