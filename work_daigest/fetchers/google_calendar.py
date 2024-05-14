@@ -19,7 +19,7 @@ def extract_formatted_events(calendar_file, d1, d2, email):
     return format_events(calendar, d1, d2, email)
 
 
-def format_events(calendar: Calendar, start: datetime, end: datetime, email):
+def filter_events(calendar: Calendar, start: datetime, end: datetime, email):
     events = calendar.events
     events = [e for e in events if e.begin >= start and e.end <= end]
     all_events = []
@@ -45,4 +45,4 @@ def format_events(calendar: Calendar, start: datetime, end: datetime, email):
 
         event_text.append("-------------------")
         all_events.append("\n".join(event_text))
-    return "\n".join(all_events)
+    return all_events

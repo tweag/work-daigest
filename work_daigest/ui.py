@@ -41,12 +41,12 @@ if st.button("Generate Summary 🪄"):
             calendar_data, github_handle, email, lower_date, upper_date, model_choice
         )
         st.info(
-            f"Got {len(calendar_data)} calendar events and {len(github_data)} GitHub events."
+            f"Got {len(calendar_data)} calendar event(s) and {len(github_data)} GitHub event(s)."
         )
         st.success(f"Generating summary for {email} using {model_choice}...")
         summary = model_fn(
             prompt=PROMPT_TEMPLATE.format(
-                calendar_data=calendar_data, github_data=github_data
+                calendar_data='\n'.join(calendar_data), github_data=github_data
             )
         )
         st.write(summary)

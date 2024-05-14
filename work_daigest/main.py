@@ -5,13 +5,14 @@ import json
 import os
 import pathlib
 from pickle import dump, load
+from typing import List
 
 import pytz
 from ics import Calendar
 
 from .bedrock import init_client, invoke_claude3, invoke_jurassic2, invoke_llama2
 from .fetchers.github import fetch_comments
-from .fetchers.google_calendar import format_events
+from .fetchers.google_calendar import filter_events
 
 PROMPT_TEMPLATE = """
     Summarize the events in the calendar and my work on GitHub and tell me what I did during the covered period of time.
@@ -32,7 +33,7 @@ PROMPT_TEMPLATE = """
     ```
     """
 
-def munge_calendar_data(file_path: str, min_date: datetime.datetime, max_date: datetime.datetime, email: str) -> str:
+def munge_calendar_data(file_path: str, min_date: datetime.datetime, max_date: datetime.datetime, email: str) -> List[str]:
     """
     Munge calendar data to be used in the prompt template.
 
@@ -46,17 +47,17 @@ def munge_calendar_data(file_path: str, min_date: datetime.datetime, max_date: d
     CACHE_FILE = "caldump.pickle"
     if os.path.exists(CACHE_FILE):
         with open(CACHE_FILE, "rb") as f:
-            cal_text = load(f)
+            events = load(f)
     else:
         with open(file_path, 'r') as f:
             calendar = Calendar(f.read())
 
         utc = pytz.UTC
-        cal_text = format_events(calendar, utc.localize(min_date), utc.localize(max_date), email)
+        events = filter_events(calendar, utc.localize(min_date), utc.localize(max_date), email)
         with open(CACHE_FILE, "wb") as f:
-            dump(cal_text, f)
+            dump(events, f)
 
-    return cal_text
+    return events
 
 def munge_github_data(file_path: str) -> str:
     """
@@ -113,7 +114,7 @@ def main():
     args = parser.parse_args()
     
     model_fn, calendar_data, github_data = process_data(args.calendar_data, args.github_handle, args.email, args.lower_date, args.upper_date, args.model)
-    summary = model_fn(prompt=PROMPT_TEMPLATE.format(calendar_data=calendar_data, github_data=github_data))
+    summary = model_fn(prompt=PROMPT_TEMPLATE.format(calendar_data='\n'.join(calendar_data), github_data=github_data))
 
     print(summary)
 
