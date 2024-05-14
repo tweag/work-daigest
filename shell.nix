@@ -3,7 +3,7 @@
   sha256 = "0x4s7g24mwkhf205d0dwmgcqr2jglkffn8xicwmab3crkfdr4cqh";
 }) { } }:
 pkgs.mkShell {
-  name = "week-dAIgest-env";
+  name = "work-daigest-env";
   buildInputs = with pkgs; [
     awscli2
     ssm-session-manager-plugin

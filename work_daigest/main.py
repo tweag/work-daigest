@@ -14,7 +14,7 @@ from .fetchers.google_calendar import format_events
 from .fetchers.github import fetch_comments
 
 PROMPT_TEMPLATE = """
-    Summarize the events in the calendar and my work on GitHub and tell me what I did this week.
+    Summarize the events in the calendar and my work on GitHub and tell me what I did during the covered period of time.
     If the event has a description, include a summary.
     Include attendees names.
     If the event is lunch, do not include it.
@@ -84,7 +84,7 @@ def main():
     """
     Main program flow.
     """
-    parser = argparse.ArgumentParser(description="Generate a summary of your work week")
+    parser = argparse.ArgumentParser(description="Generate a summary of your work")
     parser.add_argument("--calendar-data", type=pathlib.Path, help="Path to the calendar .ics file", required=True)
     parser.add_argument("--github-handle", type=str, help="GitHub handle to use when fetching GitHub data", required=True)
     parser.add_argument("--email", type=str, help="Email address to use when filtering calendar events", required=True)
