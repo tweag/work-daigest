@@ -35,6 +35,7 @@ The program expects a (classic) GitHub personal token in the environment variabl
 That token needs to have the full `repo` OAuth scopes.
 
 
+### CLI
 Run `work-daigest --help` to learn about the supported command line arguments:
 ```console
 $ GITHUB_TOKEN=<your GitHub token> work-daigest --help
@@ -56,4 +57,11 @@ options:
                         Upper date limit to consider data for, in the format YYYY-MM-DD. Defaults to today.
   --model {jurassic2,llama2,claude3}
                         Model to use for summary generation
+```
+
+### Streamlit UI
+You can also run the Streamlit UI by running the following, then opening the URL
+that Streamlit prints in your browser:
+```console
+streamlit run work_daigest/ui.py
 ```
