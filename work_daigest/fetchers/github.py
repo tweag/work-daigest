@@ -1,11 +1,12 @@
 import dataclasses
-from dataclasses import dataclass
 import datetime
 import json
-import dateutil.parser
 import os
-import requests
+from dataclasses import dataclass
 from typing import Literal, NewType
+
+import dateutil.parser
+import requests
 
 CommentText = NewType("CommentText", str)
 RepositoryName = NewType("RepositoryName", str)
@@ -24,7 +25,7 @@ def to_github_datetime_format(dt: datetime.datetime) -> str:
     """
     Convert a datetime object to the format used by GitHub's API
     """
-    return dt.isoformat()[:-7] + "Z"
+    return dt.isoformat()[:19] + "Z"
 
 BASE_URL = "https://api.github.com/search"
 
@@ -32,6 +33,7 @@ HEADERS = {
     "Accept": "application/vnd.github.v3+json",
 }
 if token := os.getenv("GITHUB_TOKEN"):
+    print("Github token found, using it to authenticate")
     HEADERS["Authorization"] = f"token {token}"
 
 def extract_next_page_link_from_header(link_header: str) -> str | None:
@@ -152,9 +154,9 @@ def fetch_comments(handle: str, lower_date: datetime.datetime, upper_date: datet
     Fetch all GitHub comments authored by user `handle`
     """
     all_comments = []
-    all_comments.append(fetch_issues(handle, lower_date, upper_date))
-    all_comments.append(fetch_prs(handle, lower_date, upper_date))
-    all_comments.append(fetch_commits(handle, lower_date, upper_date))
+    all_comments.extend(fetch_issues(handle, lower_date, upper_date))
+    all_comments.extend(fetch_prs(handle, lower_date, upper_date))
+    all_comments.extend(fetch_commits(handle, lower_date, upper_date))
     return all_comments
 
 if __name__ == "__main__":
@@ -162,8 +164,5 @@ if __name__ == "__main__":
     upper_date = datetime.datetime.now()
 
     comments = fetch_comments("simeoncarstens", lower_date, upper_date)
-    # Flatten list: why does this work? https://stackoverflow.com/a/952946/1656472
-    # Tweag style!
-    comments = sum(comments, [])
     # Without `default=str`, `dumps` will fail on `datetime` objects
     print(json.dumps(list(map(dataclasses.asdict, comments)), default=str))
