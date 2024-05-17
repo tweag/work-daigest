@@ -5,6 +5,7 @@ import streamlit as st
 from work_daigest.main import PROMPT_TEMPLATE, process_data
 
 # Title and description
+st.set_page_config(layout="wide")
 st.title("Work-dAIgest 📰")
 st.subheader("Generate a summary of your work with AI")
 
