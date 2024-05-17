@@ -33,6 +33,9 @@ PROMPT_TEMPLATE = """
     ```
     """
 
+def datetime_to_readable_date(dt: datetime.datetime) -> str:
+    return dt.strftime('%Y-%m-%d')
+
 def munge_calendar_data(cal_file: str | UploadedFile, min_date: datetime.datetime, max_date: datetime.datetime, email: str) -> List[str]:
     """
     Munge calendar data to be used in the prompt template.
@@ -116,8 +119,8 @@ def main():
         prompt=PROMPT_TEMPLATE.format(
             calendar_data='\n'.join(calendar_data),
             github_data=github_data,
-            lower_date=args.lower_date,
-            upper_date=args.upper_date
+            lower_date=datetime_to_readable_date(args.lower_date),
+            upper_date=datetime_to_readable_date(args.upper_date)
         )
     )
 

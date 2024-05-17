@@ -2,7 +2,7 @@ import datetime
 
 import streamlit as st
 
-from work_daigest.main import PROMPT_TEMPLATE, process_data
+from work_daigest.main import datetime_to_readable_date, PROMPT_TEMPLATE, process_data
 
 # Title and description
 st.title("Work-dAIgest 📰")
@@ -30,9 +30,6 @@ with st.sidebar:
     model_choice = st.selectbox(
         "Choose a model", model_options, help="Make sure you enable the model in AWS"
     )
-
-def datetime_to_readable_date(dt: datetime.datetime) -> str:
-    return dt.strftime('%Y-%m-%d')
 
 # Button to trigger summary generation
 # add magic light emoji
