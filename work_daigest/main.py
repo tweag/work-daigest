@@ -3,7 +3,7 @@ import datetime
 import functools
 import json
 import pathlib
-from typing import List, Union
+from typing import List
 
 import pytz
 from ics import Calendar
@@ -32,7 +32,7 @@ PROMPT_TEMPLATE = """
     ```
     """
 
-def munge_calendar_data(cal_file: Union[str, UploadedFile], min_date: datetime.datetime, max_date: datetime.datetime, email: str) -> List[str]:
+def munge_calendar_data(cal_file: str | UploadedFile, min_date: datetime.datetime, max_date: datetime.datetime, email: str) -> List[str]:
     """
     Munge calendar data to be used in the prompt template.
 
