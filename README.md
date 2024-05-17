@@ -13,18 +13,6 @@ With these sources, the program yields a nice summary text, for example (in the 
 
 [![Screenshot of the Streamlit UI](./images/demo.png)](./images/demo.png)
 
-## Getting the data
-
-### GitHub data
-
-GitHub data (issues, PRs, commits) is retrieved automatically using the code in `work_daigest/fetchers/github.py`, but follow instructions in the [fetchers README](work_daigest/fetchers/README.md) of you'd like to manually fetch the data and inspect it.
-
-### Google Calendar data
-
-Currently, Google Calendar data needs to be exported manually into an `.ics` file.
-To do that, open Google Calendar in your browser, then go to "Settings" (the cogwheel symbol) -> "Import & export" and click the "Export" button.
-This downloads a zipped `.ics` file, which you will have to unpack.
-
 ## Usage
 
 ### Configure AWS Bedrock and AWS credentials
@@ -46,6 +34,18 @@ That token needs to have the full `repo` OAuth scopes.
 To get started, install the program in a virtual environment using `nix-shell` if you're a Nix person.
 If you're not, you'll have to have [Poetry](https://python-poetry.org/) installed.
 Then, you can just run `poetry install` to install the application and all required dependencies and you're ready to go.
+
+### Get the data
+
+#### GitHub data
+
+GitHub data (issues, PRs, commits) is retrieved automatically using the code in `work_daigest/fetchers/github.py`, but follow instructions in the [fetchers README](work_daigest/fetchers/README.md) of you'd like to manually fetch the data and inspect it.
+
+#### Google Calendar data
+
+Currently, Google Calendar data needs to be exported manually into an `.ics` file.
+To do that, open Google Calendar in your browser, then go to "Settings" (the cogwheel symbol) -> "Import & export" and click the "Export" button.
+This downloads a zipped `.ics` file, which you will have to unpack.
 
 ### Run `work-daigest`
 
