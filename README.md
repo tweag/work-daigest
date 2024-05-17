@@ -47,7 +47,12 @@ To get started, install the program in a virtual environment using `nix-shell` i
 If you're not, you'll have to have [Poetry](https://python-poetry.org/) installed.
 Then, you can just run `poetry install` to install the application and all required dependencies and you're ready to go.
 
-### CLI
+### Run `work-daigest`
+
+You can run the program from the command line using the `work-daigest` command, or you can use the Streamlit UI.
+
+#### Command line interface
+
 Run `work-daigest --help` to learn about the supported command line arguments:
 ```console
 $ GITHUB_TOKEN=<your GitHub token> work-daigest --help
@@ -71,9 +76,9 @@ options:
                         Model to use for summary generation
 ```
 
-### Streamlit UI
-You can also run the Streamlit UI by running the following, then opening the URL
-that Streamlit prints in your browser:
+#### Streamlit UI
+To run the Streamlit UI, run the following command:
 ```console
-streamlit run work_daigest/ui.py
+GITHUB_TOKEN=<your GitHub token> streamlit run work_daigest/ui.py
 ```
+which will open a browser window with the UI.
