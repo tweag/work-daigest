@@ -14,6 +14,7 @@ from .fetchers.github import fetch_comments
 from .fetchers.google_calendar import filter_events
 
 PROMPT_TEMPLATE = """
+    Human:
     Summarize the events in the calendar and my work on GitHub and tell me what I did during the covered period of time.
     If the event has a description, include a summary.
     Include attendees names.
@@ -30,6 +31,8 @@ PROMPT_TEMPLATE = """
     ```
     {github_data}
     ```
+
+    AI:
     """
 
 def munge_calendar_data(cal_file: str | UploadedFile, min_date: datetime.datetime, max_date: datetime.datetime, email: str) -> List[str]:
