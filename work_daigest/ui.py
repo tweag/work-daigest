@@ -31,6 +31,9 @@ with st.sidebar:
         "Choose a model", model_options, help="Make sure you enable the model in AWS"
     )
 
+def datetime_to_readable_date(dt: datetime.datetime) -> str:
+    return dt.strftime('%Y-%m-%d')
+
 # Button to trigger summary generation
 # add magic light emoji
 if st.button("Generate Summary 🪄"):
@@ -46,7 +49,10 @@ if st.button("Generate Summary 🪄"):
         st.success(f"Generating summary for {email} using {model_choice}...")
         summary = model_fn(
             prompt=PROMPT_TEMPLATE.format(
-                calendar_data='\n'.join(calendar_data), github_data=github_data
+                calendar_data='\n'.join(calendar_data),
+                github_data=github_data,
+                lower_date=datetime_to_readable_date(lower_date),
+                upper_date=datetime_to_readable_date(upper_date)
             )
         )
         st.write(summary)
