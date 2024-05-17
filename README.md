@@ -39,7 +39,7 @@ Then, you can just run `poetry install` to install the application and all requi
 
 #### GitHub data
 
-GitHub data (issues, PRs, commits) is retrieved automatically using the code in `work_daigest/fetchers/github.py`, but follow instructions in the [fetchers README](work_daigest/fetchers/README.md) of you'd like to manually fetch the data and inspect it.
+GitHub data (issues, PRs, commits) is retrieved automatically using the code in `work_daigest/fetchers/github.py`, but follow instructions in the [fetchers README](work_daigest/fetchers/README.md) if you'd like to manually fetch the data and inspect it.
 
 #### Google Calendar data
 
