@@ -1,6 +1,8 @@
-from ics import Calendar
 import re
 from datetime import datetime
+
+from ics import Calendar
+
 
 def remove_text_pattern(description):
     pattern = r"-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-[\s\S]+-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-"
@@ -8,16 +10,7 @@ def remove_text_pattern(description):
     return re.sub(pattern, '', description)
 
 
-def extract_formatted_events(calendar_file, d1, d2, email):
-    with open(calendar_file, 'r') as f:
-        print("Reading calendar from file")
-        calendar = Calendar(f.read())
-
-    print("Extracting events from calendar")
-    return format_events(calendar, d1, d2, email)
-
-
-def format_events(calendar: Calendar, start: datetime, end: datetime, email):
+def filter_events(calendar: Calendar, start: datetime, end: datetime, email):
     events = calendar.events
     events = [e for e in events if e.begin >= start and e.end <= end]
     all_events = []
@@ -43,4 +36,4 @@ def format_events(calendar: Calendar, start: datetime, end: datetime, email):
 
         event_text.append("-------------------")
         all_events.append("\n".join(event_text))
-    return "\n".join(all_events)
+    return all_events
