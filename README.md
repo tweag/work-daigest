@@ -27,12 +27,6 @@ This downloads a zipped `.ics` file, which you will have to unpack.
 
 ## Usage
 
-### Set up the software environment
-
-To get started, install the program in a virtual environment using `nix-shell` if you're a Nix person.
-If you're not, you'll have to have [Poetry](https://python-poetry.org/) installed.
-Then, you can just run `poetry install` to install the application and all required dependencies and you're ready to go.
-
 ### Configure AWS Bedrock and AWS credentials
 
 The application currently calls out to [AWS Bedrock](https://aws.amazon.com/bedrock/) for LLM access.
@@ -47,6 +41,11 @@ If you want data from private GitHub repositories be included in the summary, yo
 The program expects a (classic) GitHub personal token in the environment variable `GITHUB_TOKEN`.
 That token needs to have the full `repo` OAuth scopes.
 
+### Set up the software environment
+
+To get started, install the program in a virtual environment using `nix-shell` if you're a Nix person.
+If you're not, you'll have to have [Poetry](https://python-poetry.org/) installed.
+Then, you can just run `poetry install` to install the application and all required dependencies and you're ready to go.
 
 ### CLI
 Run `work-daigest --help` to learn about the supported command line arguments:
