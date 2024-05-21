@@ -39,7 +39,7 @@ PROMPT_TEMPLATE = """
 def datetime_to_readable_date(dt: datetime.datetime) -> str:
     return dt.strftime('%Y-%m-%d')
 
-def munge_calendar_data(cal_file: str | UploadedFile, min_date: datetime.datetime, max_date: datetime.datetime, email: str) -> List[str]:
+def munge_calendar_data(cal_file: pathlib.PosixPath | UploadedFile, min_date: datetime.datetime, max_date: datetime.datetime, email: str) -> List[str]:
     """
     Munge calendar data to be used in the prompt template.
 
@@ -51,11 +51,11 @@ def munge_calendar_data(cal_file: str | UploadedFile, min_date: datetime.datetim
     """
     if isinstance(cal_file, UploadedFile):
         file_content = cal_file.getvalue().decode("utf-8")
-    elif isinstance(cal_file, str):
+    elif isinstance(cal_file, pathlib.PosixPath):
         with open(cal_file, 'r') as f:
             file_content = f.read()
     else:
-        raise ValueError(f"Invalid file type: {type(file_path)}")
+        raise ValueError(f"Invalid file type: {type(cal_file)}")
     calendar = Calendar(file_content)
 
     utc = pytz.UTC
@@ -92,15 +92,15 @@ def process_data(calendar_file, github_handle, email, lower_date, upper_date, mo
         "llama2": functools.partial(invoke_llama2, client=runtime_client),
         "claude3": functools.partial(invoke_claude3, client=runtime_client)
     }
-    
+
     model_fn = model_functions.get(model_choice)
 
     if model_fn is None:
         raise ValueError(f"Invalid model choice: {model_choice}. Choose from {model_functions.keys()}.")
-        
+
     calendar_data = munge_calendar_data(calendar_file, lower_date, upper_date, email)
     github_data = fetch_comments(github_handle, lower_date, upper_date)
-    
+
     return model_fn, calendar_data, github_data
 
 
@@ -116,7 +116,7 @@ def main():
     parser.add_argument("--upper-date", type=convert_to_datetime, help="Upper date limit to consider data for, in the format YYYY-MM-DD. Defaults to today.", default=datetime.datetime.now().strftime("%Y-%m-%d"))
     parser.add_argument("--model", type=str, choices=["jurassic2", "llama2", "claude3"], default="claude3", help="Model to use for summary generation")
     args = parser.parse_args()
-    
+
     model_fn, calendar_data, github_data = process_data(args.calendar_data, args.github_handle, args.email, args.lower_date, args.upper_date, args.model)
     summary = model_fn(
         prompt=PROMPT_TEMPLATE.format(
