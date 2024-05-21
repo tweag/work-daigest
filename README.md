@@ -13,35 +13,49 @@ With these sources, the program yields a nice summary text, for example (in the 
 
 [![Screenshot of the Streamlit UI](./images/demo.png)](./images/demo.png)
 
-## Getting the data
-
-### GitHub data
-
-GitHub data (issues, PRs, commits) is retrieved automatically using the code in `work_daigest/fetchers/github.py`, but follow instructions in the [fetchers README](work_daigest/fetchers/README.md) of you'd like to manually fetch the data and inspect it.
-
-### Google Calendar data
-
-Currently, Google Calendar data needs to be exported manually into an `.ics` file.
-To do that, open Google Calendar in your browser, then go to "Settings" (the cogwheel symbol) -> "Import & export" and click the "Export" button.
-This downloads a zipped `.ics` file, which you will have to unpack.
-
 ## Usage
+
+### Configure AWS Bedrock and AWS credentials
+
+The application currently calls out to [AWS Bedrock](https://aws.amazon.com/bedrock/) for LLM access.
+So you'll have to enable the relevant models (default is Claude-3 Sonnet) in Bedrock.
+
+Once that is done, make sure that you have local AWS credentials with all necessary permissions set up, for example using `aws sso configure` and `aws sso login`.
+Don't forget to set the `AWS_PROFILE` environment variable to your AWS profile name if it's not the default.
+
+### Configure GitHub (optional)
+
+If you want data from private GitHub repositories be included in the summary, you need to set up a GitHub personal token.
+The program expects a (classic) GitHub personal token in the environment variable `GITHUB_TOKEN`.
+That token needs to have the full `repo` OAuth scopes.
+
+### Set up the software environment
 
 To get started, install the program in a virtual environment using `nix-shell` if you're a Nix person.
 If you're not, you'll have to have [Poetry](https://python-poetry.org/) installed.
 Then, you can just run `poetry install` to install the application and all required dependencies and you're ready to go.
 
-Note that the application currently calls out to [AWS Bedrock](https://aws.amazon.com/bedrock/) for LLM access.
-So you'll have to enable the relevant models (default is Claude-3 Sonnet) in Bedrock and make sure that you have AWS credentials with all necessary permissions set up, for example using `aws sso configure` and `aws sso login`.
-Don't forget to set the `AWS_PROFILE` environment variable to your AWS profile name if it's not the default.
-The program expects a (classic) GitHub personal token in the environment variable `GITHUB_TOKEN`.
-That token needs to have the full `repo` OAuth scopes.
+### Get the data
 
+#### GitHub data
 
-### CLI
+GitHub data (issues, PRs, commits) is retrieved automatically using the code in `work_daigest/fetchers/github.py`, but follow instructions in the [fetchers README](work_daigest/fetchers/README.md) if you'd like to manually fetch the data and inspect it.
+
+#### Google Calendar data
+
+Currently, Google Calendar data needs to be exported manually into an `.ics` file.
+To do that, open Google Calendar in your browser, then go to "Settings" (the cogwheel symbol) -> "Import & export" and click the "Export" button.
+This downloads a zipped `.ics` file, which you will have to unpack.
+
+### Run `work-daigest`
+
+You can run the program from the command line using the `work-daigest` command, or you can use the Streamlit UI.
+
+#### Command line interface
+
 Run `work-daigest --help` to learn about the supported command line arguments:
 ```console
-$ GITHUB_TOKEN=<your GitHub token> work-daigest --help
+$ work-daigest --help
 usage: work-daigest [-h] --calendar-data CALENDAR_DATA --github-handle GITHUB_HANDLE --email EMAIL [--lower-date LOWER_DATE] [--upper-date UPPER_DATE]
                     [--model {jurassic2,llama2,claude3}]
 
@@ -61,10 +75,10 @@ options:
   --model {jurassic2,llama2,claude3}
                         Model to use for summary generation
 ```
-
-### Streamlit UI
-You can also run the Streamlit UI by running the following, then opening the URL
-that Streamlit prints in your browser:
+When calling `work-daigest`, don't forget to set the `GITHUB_TOKEN` environment variable if needed.
+#### Streamlit UI
+To run the Streamlit UI, run the following command (optionally defining your GitHub token):
 ```console
-streamlit run work_daigest/ui.py
+GITHUB_TOKEN=<your GitHub token> streamlit run work_daigest/ui.py
 ```
+which will open a browser window with the UI.
