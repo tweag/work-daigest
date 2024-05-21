@@ -11,7 +11,10 @@ import requests
 CommentText = NewType("CommentText", str)
 RepositoryName = NewType("RepositoryName", str)
 CommentType = NewType("CommentType", str)
-Action = Literal["created", "updated", "closed", "reopened", "merged", "commented", "committed"]
+Action = Literal[
+    "created", "updated", "closed", "reopened", "merged", "commented", "committed"
+]
+
 
 @dataclass
 class GitHubComment:
@@ -27,6 +30,7 @@ def to_github_datetime_format(dt: datetime.datetime) -> str:
     """
     return dt.isoformat()[:19] + "Z"
 
+
 BASE_URL = "https://api.github.com/search"
 
 HEADERS = {
@@ -35,6 +39,7 @@ HEADERS = {
 if token := os.getenv("GITHUB_TOKEN"):
     print("Github token found, using it to authenticate")
     HEADERS["Authorization"] = f"token {token}"
+
 
 def extract_next_page_link_from_header(link_header: str) -> str | None:
     """
@@ -52,6 +57,7 @@ def extract_next_page_link_from_header(link_header: str) -> str | None:
             # The URL is enclosed in angle brackets, so we strip those off
             return url.lstrip("<").rstrip(">")
     return None
+
 
 def send_query(url: str, query: str) -> list[dict]:
     """
@@ -78,6 +84,7 @@ def send_query(url: str, query: str) -> list[dict]:
 
     return items
 
+
 def get_latest_action(comment_json: dict) -> (str, str):
     min_date = "1970-01-01T00:00:00Z"
     created = ("created", comment_json.get("created_at") or min_date)
@@ -88,13 +95,17 @@ def get_latest_action(comment_json: dict) -> (str, str):
     return actions[-1]
 
 
-def fetch_issues(handle: str, lower_date: datetime.datetime, upper_date: datetime.datetime) -> list[GitHubComment]:
+def fetch_issues(
+    handle: str, lower_date: datetime.datetime, upper_date: datetime.datetime
+) -> list[GitHubComment]:
     """
     Fetch all GitHub issues authored by user `handle`
     """
     # TODO: could also try to use "updated_at" or "closed_at" fields
     datetime_filter = f"created:{to_github_datetime_format(lower_date)}..{to_github_datetime_format(upper_date)}"
-    response_items = send_query(f"{BASE_URL}/issues", f"is:issue+author:{handle}+{datetime_filter}")
+    response_items = send_query(
+        f"{BASE_URL}/issues", f"is:issue+author:{handle}+{datetime_filter}"
+    )
     all_comments = []
     for comment_json in response_items:
         latest_action, date = get_latest_action(comment_json)
@@ -104,19 +115,26 @@ def fetch_issues(handle: str, lower_date: datetime.datetime, upper_date: datetim
                 CommentText(comment_json["body"]),
                 # example repo URL: https://api.github.com/repos/tweag/chainsail
                 # so we use "tweag/chainsail" as human-readable repo identifier
-                RepositoryName("/".join(comment_json["repository_url"].split("/")[-2:])),
-                latest_action
+                RepositoryName(
+                    "/".join(comment_json["repository_url"].split("/")[-2:])
+                ),
+                latest_action,
             )
         )
     return all_comments
 
-def fetch_prs(handle: str, lower_date: datetime.datetime, upper_date: datetime.datetime) -> list[GitHubComment]:
+
+def fetch_prs(
+    handle: str, lower_date: datetime.datetime, upper_date: datetime.datetime
+) -> list[GitHubComment]:
     """
     Fetch all GitHub pull requests authored by user `handle`
     """
     # TODO: could also try to use "updated_at" or "closed_at" fields
     datetime_filter = f"created:{to_github_datetime_format(lower_date)}..{to_github_datetime_format(upper_date)}"
-    response_items = send_query(f"{BASE_URL}/issues", f"is:pull-request+author:{handle}+{datetime_filter}")
+    response_items = send_query(
+        f"{BASE_URL}/issues", f"is:pull-request+author:{handle}+{datetime_filter}"
+    )
     all_comments = []
     for comment_json in response_items:
         latest_action, date = get_latest_action(comment_json)
@@ -126,30 +144,39 @@ def fetch_prs(handle: str, lower_date: datetime.datetime, upper_date: datetime.d
                 CommentText(comment_json["body"]),
                 # example repo URL: https://api.github.com/repos/tweag/chainsail
                 # so we use "tweag/chainsail" as human-readable repo identifier
-                RepositoryName("/".join(comment_json["repository_url"].split("/")[-2:])),
-                latest_action
+                RepositoryName(
+                    "/".join(comment_json["repository_url"].split("/")[-2:])
+                ),
+                latest_action,
             )
         )
     return all_comments
 
-def fetch_commits(handle: str, lower_date: datetime.datetime, upper_date: datetime.datetime) -> list[GitHubComment]:
+
+def fetch_commits(
+    handle: str, lower_date: datetime.datetime, upper_date: datetime.datetime
+) -> list[GitHubComment]:
     """
     Fetch all GitHub commits authored by user `handle`
     """
     datetime_filter = f"author-date:{to_github_datetime_format(lower_date)}..{to_github_datetime_format(upper_date)}"
-    response_items = send_query(f"{BASE_URL}/commits", f"author:{handle}+committer:{handle}+{datetime_filter}")
+    response_items = send_query(
+        f"{BASE_URL}/commits", f"author:{handle}+committer:{handle}+{datetime_filter}"
+    )
     return [
         GitHubComment(
             dateutil.parser.parse(comment_json["commit"]["author"]["date"]),
             CommentText(comment_json["commit"]["message"]),
             RepositoryName(comment_json["repository"]["full_name"]),
-            "committed"
+            "committed",
         )
         for comment_json in response_items
     ]
 
 
-def fetch_comments(handle: str, lower_date: datetime.datetime, upper_date: datetime.datetime) -> list[GitHubComment]:
+def fetch_comments(
+    handle: str, lower_date: datetime.datetime, upper_date: datetime.datetime
+) -> list[GitHubComment]:
     """
     Fetch all GitHub comments authored by user `handle`
     """
@@ -158,6 +185,7 @@ def fetch_comments(handle: str, lower_date: datetime.datetime, upper_date: datet
     all_comments.extend(fetch_prs(handle, lower_date, upper_date))
     all_comments.extend(fetch_commits(handle, lower_date, upper_date))
     return all_comments
+
 
 if __name__ == "__main__":
     lower_date = datetime.datetime.now() - datetime.timedelta(days=7)

@@ -9,15 +9,20 @@ logger = logging.getLogger(__name__)
 
 def list_models(client, pattern: str):
     response = client.list_foundation_models()
-    return [model['modelId'] for model in response['modelSummaries']
-            if pattern in model['modelId'] and 'TEXT' in model['outputModalities']]
+    return [
+        model["modelId"]
+        for model in response["modelSummaries"]
+        if pattern in model["modelId"] and "TEXT" in model["outputModalities"]
+    ]
 
 
 def init_client(service_name: str, region_name: str):
     return boto3.client(service_name, region_name=region_name)
 
 
-def invoke_jurassic2(client, prompt: str, model_id: str = "ai21.j2-jumbo-instruct") -> str:
+def invoke_jurassic2(
+    client, prompt: str, model_id: str = "ai21.j2-jumbo-instruct"
+) -> str:
     """
     Invokes the AI21 Labs Jurassic-2 large-language model to run an inference
     using the input provided in the request body.
@@ -41,9 +46,7 @@ def invoke_jurassic2(client, prompt: str, model_id: str = "ai21.j2-jumbo-instruc
             "maxTokens": 200,
         }
 
-        response = client.invoke_model(
-            modelId=model_id, body=json.dumps(body)
-        )
+        response = client.invoke_model(modelId=model_id, body=json.dumps(body))
 
         response_body = json.loads(response["body"].read())
         completion = response_body["completions"][0]["data"]["text"]
@@ -55,7 +58,9 @@ def invoke_jurassic2(client, prompt: str, model_id: str = "ai21.j2-jumbo-instruc
         raise
 
 
-def invoke_llama2(client, prompt: str, model_id: str = "meta.llama2-70b-chat-v1") -> str:
+def invoke_llama2(
+    client, prompt: str, model_id: str = "meta.llama2-70b-chat-v1"
+) -> str:
     """
     Invokes the Meta Llama 2 large-language model to run an inference
     using the input provided in the request body.
@@ -72,9 +77,7 @@ def invoke_llama2(client, prompt: str, model_id: str = "meta.llama2-70b-chat-v1"
             "max_gen_len": 1000,
         }
 
-        response = client.invoke_model(
-            modelId=model_id, body=json.dumps(body)
-        )
+        response = client.invoke_model(modelId=model_id, body=json.dumps(body))
 
         response_body = json.loads(response["body"].read())
         completion = response_body["generation"]
@@ -85,7 +88,10 @@ def invoke_llama2(client, prompt: str, model_id: str = "meta.llama2-70b-chat-v1"
         logger.error("Couldn't invoke Llama 2")
         raise
 
-def invoke_claude3(client, prompt: str, model_id: str = "anthropic.claude-3-sonnet-20240229-v1:0") -> str:
+
+def invoke_claude3(
+    client, prompt: str, model_id: str = "anthropic.claude-3-sonnet-20240229-v1:0"
+) -> str:
     """
     Invokes the Anthropics Claude-3 large-language model to run an inference
     using the input provided in the request body.
@@ -103,20 +109,10 @@ def invoke_claude3(client, prompt: str, model_id: str = "anthropic.claude-3-sonn
             "temperature": 0.3,
             "top_p": 0.3,
             "messages": [
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": prompt
-                        }
-                    ]
-                }
-            ]
+                {"role": "user", "content": [{"type": "text", "text": prompt}]}
+            ],
         }
-        response = client.invoke_model(
-            modelId=model_id, body=json.dumps(body)
-        )
+        response = client.invoke_model(modelId=model_id, body=json.dumps(body))
         response_body = json.loads(response["body"].read())
         completion = response_body["content"][0]["text"]
 
@@ -126,7 +122,8 @@ def invoke_claude3(client, prompt: str, model_id: str = "anthropic.claude-3-sonn
         logger.error("Couldn't invoke Claude-3")
         raise e
 
-if __name__ == '__main__':
-    client = init_client('bedrock', 'us-east-1')
-    for a in list_models(client, ''):
+
+if __name__ == "__main__":
+    client = init_client("bedrock", "us-east-1")
+    for a in list_models(client, ""):
         print(a)

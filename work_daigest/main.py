@@ -36,10 +36,17 @@ PROMPT_TEMPLATE = """
     AI:
     """
 
-def datetime_to_readable_date(dt: datetime.datetime) -> str:
-    return dt.strftime('%Y-%m-%d')
 
-def munge_calendar_data(cal_file: pathlib.PosixPath | UploadedFile, min_date: datetime.datetime, max_date: datetime.datetime, email: str) -> List[str]:
+def datetime_to_readable_date(dt: datetime.datetime) -> str:
+    return dt.strftime("%Y-%m-%d")
+
+
+def munge_calendar_data(
+    cal_file: pathlib.PosixPath | UploadedFile,
+    min_date: datetime.datetime,
+    max_date: datetime.datetime,
+    email: str,
+) -> List[str]:
     """
     Munge calendar data to be used in the prompt template.
 
@@ -52,16 +59,19 @@ def munge_calendar_data(cal_file: pathlib.PosixPath | UploadedFile, min_date: da
     if isinstance(cal_file, UploadedFile):
         file_content = cal_file.getvalue().decode("utf-8")
     elif isinstance(cal_file, pathlib.PosixPath):
-        with open(cal_file, 'r') as f:
+        with open(cal_file, "r") as f:
             file_content = f.read()
     else:
         raise ValueError(f"Invalid file type: {type(cal_file)}")
     calendar = Calendar(file_content)
 
     utc = pytz.UTC
-    events = filter_events(calendar, utc.localize(min_date), utc.localize(max_date), email)
+    events = filter_events(
+        calendar, utc.localize(min_date), utc.localize(max_date), email
+    )
 
     return events
+
 
 def munge_github_data(file_path: str) -> str:
     """
@@ -71,10 +81,11 @@ def munge_github_data(file_path: str) -> str:
       as produced by the GitHub fetcher.
     :return: Munged GitHub data.
     """
-    with open(file_path, 'r') as f:
+    with open(file_path, "r") as f:
         github_data = json.load(f)
 
     return json.dumps(github_data)
+
 
 def convert_to_datetime(datestr: str) -> datetime.datetime:
     """
@@ -85,18 +96,22 @@ def convert_to_datetime(datestr: str) -> datetime.datetime:
     return datetime.datetime.strptime(datestr, "%Y-%m-%d").replace(microsecond=1)
 
 
-def process_data(calendar_file, github_handle, email, lower_date, upper_date, model_choice):
-    runtime_client = init_client('bedrock-runtime', 'us-east-1')
+def process_data(
+    calendar_file, github_handle, email, lower_date, upper_date, model_choice
+):
+    runtime_client = init_client("bedrock-runtime", "us-east-1")
     model_functions = {
         "jurassic2": functools.partial(invoke_jurassic2, client=runtime_client),
         "llama2": functools.partial(invoke_llama2, client=runtime_client),
-        "claude3": functools.partial(invoke_claude3, client=runtime_client)
+        "claude3": functools.partial(invoke_claude3, client=runtime_client),
     }
 
     model_fn = model_functions.get(model_choice)
 
     if model_fn is None:
-        raise ValueError(f"Invalid model choice: {model_choice}. Choose from {model_functions.keys()}.")
+        raise ValueError(
+            f"Invalid model choice: {model_choice}. Choose from {model_functions.keys()}."
+        )
 
     calendar_data = munge_calendar_data(calendar_file, lower_date, upper_date, email)
     github_data = fetch_comments(github_handle, lower_date, upper_date)
@@ -109,21 +124,61 @@ def main():
     Main program flow.
     """
     parser = argparse.ArgumentParser(description="Generate a summary of your work")
-    parser.add_argument("--calendar-data", type=pathlib.Path, help="Path to the calendar .ics file", required=True)
-    parser.add_argument("--github-handle", type=str, help="GitHub handle to use when fetching GitHub data", required=True)
-    parser.add_argument("--email", type=str, help="Email address to use when filtering calendar events", required=True)
-    parser.add_argument("--lower-date", type=convert_to_datetime, help="Lower date limit to consider data for, in the format YYYY-MM-DD. Defaults to today - 7 days.", default=(datetime.datetime.today() - datetime.timedelta(days=7)).strftime("%Y-%m-%d"))
-    parser.add_argument("--upper-date", type=convert_to_datetime, help="Upper date limit to consider data for, in the format YYYY-MM-DD. Defaults to today.", default=datetime.datetime.now().strftime("%Y-%m-%d"))
-    parser.add_argument("--model", type=str, choices=["jurassic2", "llama2", "claude3"], default="claude3", help="Model to use for summary generation")
+    parser.add_argument(
+        "--calendar-data",
+        type=pathlib.Path,
+        help="Path to the calendar .ics file",
+        required=True,
+    )
+    parser.add_argument(
+        "--github-handle",
+        type=str,
+        help="GitHub handle to use when fetching GitHub data",
+        required=True,
+    )
+    parser.add_argument(
+        "--email",
+        type=str,
+        help="Email address to use when filtering calendar events",
+        required=True,
+    )
+    parser.add_argument(
+        "--lower-date",
+        type=convert_to_datetime,
+        help="Lower date limit to consider data for, in the format YYYY-MM-DD. Defaults to today - 7 days.",
+        default=(datetime.datetime.today() - datetime.timedelta(days=7)).strftime(
+            "%Y-%m-%d"
+        ),
+    )
+    parser.add_argument(
+        "--upper-date",
+        type=convert_to_datetime,
+        help="Upper date limit to consider data for, in the format YYYY-MM-DD. Defaults to today.",
+        default=datetime.datetime.now().strftime("%Y-%m-%d"),
+    )
+    parser.add_argument(
+        "--model",
+        type=str,
+        choices=["jurassic2", "llama2", "claude3"],
+        default="claude3",
+        help="Model to use for summary generation",
+    )
     args = parser.parse_args()
 
-    model_fn, calendar_data, github_data = process_data(args.calendar_data, args.github_handle, args.email, args.lower_date, args.upper_date, args.model)
+    model_fn, calendar_data, github_data = process_data(
+        args.calendar_data,
+        args.github_handle,
+        args.email,
+        args.lower_date,
+        args.upper_date,
+        args.model,
+    )
     summary = model_fn(
         prompt=PROMPT_TEMPLATE.format(
-            calendar_data='\n'.join(calendar_data),
+            calendar_data="\n".join(calendar_data),
             github_data=github_data,
             lower_date=datetime_to_readable_date(args.lower_date),
-            upper_date=datetime_to_readable_date(args.upper_date)
+            upper_date=datetime_to_readable_date(args.upper_date),
         )
     )
 

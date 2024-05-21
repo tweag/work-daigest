@@ -1,0 +1,31 @@
+name: CI
+
+on: [push, pull_request]
+
+
+jobs:
+  ci:
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+        python-version: [3.11]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: Gr1N/setup-poetry@v8
+        with:
+          poetry-version: "1.6.1"
+      - name: Install dependencies
+        run: poetry install
+      - name: Run isort
+        run: poetry run isort work_daigest/ --check --diff
+      - name: Run black
+        run: poetry run black . --check --diff
+      - name: Run ruff
+        run: poetry run ruff .
+      - name: Run fawltydeps
+        run: poetry run fawltydeps

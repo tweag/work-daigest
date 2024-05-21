@@ -7,14 +7,16 @@ from ics import Calendar
 def remove_text_pattern(description):
     pattern = r"-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-[\s\S]+-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-"
     # remove the pattern from the description
-    return re.sub(pattern, '', description)
+    return re.sub(pattern, "", description)
 
 
 def filter_events(calendar: Calendar, start: datetime, end: datetime, email):
     events = calendar.events
     events = [e for e in events if e.begin >= start and e.end <= end]
     all_events = []
-    is_valid_attendee = lambda att: att.email == email and (att.partstat not in ("DECLINED", "NEEDS-ACTION"))
+    is_valid_attendee = lambda att: att.email == email and (
+        att.partstat not in ("DECLINED", "NEEDS-ACTION")
+    )
 
     for e in events:
         event_text = []

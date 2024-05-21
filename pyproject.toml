@@ -18,11 +18,12 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.11"
 ics = "^0.7.2"
-setuptools = "^68.2.2"
 requests = "^2.31.0"
 boto3 = "^1.34.37"
+botocore = "^1.34.99"
 pytz = "^2024.1"
 streamlit = "^1.30.0"
+python-dateutil = "^2.9.0.post0"
 
 [tool.poetry.scripts]
 work-daigest = "work_daigest:main.main"
