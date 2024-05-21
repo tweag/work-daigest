@@ -55,7 +55,7 @@ You can run the program from the command line using the `work-daigest` command, 
 
 Run `work-daigest --help` to learn about the supported command line arguments:
 ```console
-$ GITHUB_TOKEN=<your GitHub token> work-daigest --help
+$ work-daigest --help
 usage: work-daigest [-h] --calendar-data CALENDAR_DATA --github-handle GITHUB_HANDLE --email EMAIL [--lower-date LOWER_DATE] [--upper-date UPPER_DATE]
                     [--model {jurassic2,llama2,claude3}]
 
@@ -75,9 +75,9 @@ options:
   --model {jurassic2,llama2,claude3}
                         Model to use for summary generation
 ```
-
+When calling `work-daigest`, don't forget to set the `GITHUB_TOKEN` environment variable if needed.
 #### Streamlit UI
-To run the Streamlit UI, run the following command:
+To run the Streamlit UI, run the following command (optionally defining your GitHub token):
 ```console
 GITHUB_TOKEN=<your GitHub token> streamlit run work_daigest/ui.py
 ```
