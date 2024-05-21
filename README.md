@@ -9,29 +9,9 @@ The goal is to summarize your work using data from multiple work-related sources
 - ...
 
 Right now, supported data sources are GitHub and Google Calendar.
-With these sources, the program yields a nice summary text, for example:
+With these sources, the program yields a nice summary text, for example (in the UI):
 
-> During the period from 2024-02-01 to 2024-03-15, based on the calendar events and your work on GitHub, you:
->
-> Calendar Events:
-> - Attended several meetings related to the Azure Data Engineering certification, where you learned interesting things and shared updates.
-> - Had regular check-ins and meetings with your colleagues <redacted>, and others, likely to discuss ongoing projects and tasks.
-> - Participated in daily and weekly meetings for the GenAI group, where you discussed progress, shared knowledge, and collaborated on related tasks.
-> - Attended internal meetings and check-ins for the <redacted> project, involving team members like <redacted>.
-> - Had meetings to discuss the <redacted> pipeline implementation with colleagues like <redacted>.
-> - Participated in knowledge sharing sessions and a department monthly update meeting.
-> - Attended meetings related to the <redacted> project, including a solution design meeting and a prep call.
-> - Had a meeting to discuss potential directions for the <redacted> group.
->
-> GitHub Activities:
-> - Worked on the <redacted> repository, where you opened issues related to generating <redacted>, and tracking a potential blog post about the theoretical basis of diffusion models.
-> - Contributed to the <redacted> repository, investigating an issue with a Netlify deployment.
-> - Opened and worked on issues in the `pepkit/pipestat` repository, fixing examples and improving documentation.
-> - Made several commits to the `tweag/week-dAIgest` repository, adding functionality to fetch data from GitHub and Google Calendar, handle pagination, and output results as JSON.
-> - Made commits to your personal repository `simeoncarstens/kelloggs`, working on a simulation involving friction forces and creating movies using the `celluloid` library.
-> - Initialized a new personal repository called `simeoncarstens/foam`.
->
-> Overall, your activities revolved around attending meetings related to various projects, collaborating with colleagues, contributing to open-source repositories, and working on personal projects involving simulations and data visualization.
+[![Screenshot of the Streamlit UI](./images/demo.png)](./images/demo.png)
 
 ## Getting the data
 
