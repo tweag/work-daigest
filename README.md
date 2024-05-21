@@ -9,6 +9,9 @@ The goal is to summarize your work using data from multiple work-related sources
 - ...
 
 Right now, supported data sources are GitHub and Google Calendar.
+With these sources, the program yields a nice summary text, for example (in the UI):
+
+[![Screenshot of the Streamlit UI](./images/demo.png)](./images/demo.png)
 
 ## Getting the data
 
