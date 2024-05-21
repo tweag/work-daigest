@@ -16,6 +16,7 @@ from .fetchers.google_calendar import filter_events
 PROMPT_TEMPLATE = """
     Human:
     Summarize the events in the calendar and my work on GitHub and tell me what I did during the covered period of time.
+    Please mention the covered period of time ({lower_date} - {upper_date}) in your answer.
     If the event has a description, include a summary.
     Include attendees names.
     If the event is lunch, do not include it.
@@ -34,6 +35,9 @@ PROMPT_TEMPLATE = """
 
     AI:
     """
+
+def datetime_to_readable_date(dt: datetime.datetime) -> str:
+    return dt.strftime('%Y-%m-%d')
 
 def munge_calendar_data(cal_file: str | UploadedFile, min_date: datetime.datetime, max_date: datetime.datetime, email: str) -> List[str]:
     """
@@ -114,7 +118,14 @@ def main():
     args = parser.parse_args()
     
     model_fn, calendar_data, github_data = process_data(args.calendar_data, args.github_handle, args.email, args.lower_date, args.upper_date, args.model)
-    summary = model_fn(prompt=PROMPT_TEMPLATE.format(calendar_data='\n'.join(calendar_data), github_data=github_data))
+    summary = model_fn(
+        prompt=PROMPT_TEMPLATE.format(
+            calendar_data='\n'.join(calendar_data),
+            github_data=github_data,
+            lower_date=datetime_to_readable_date(args.lower_date),
+            upper_date=datetime_to_readable_date(args.upper_date)
+        )
+    )
 
     print(summary)
 
