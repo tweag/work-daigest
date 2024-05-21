@@ -2,7 +2,7 @@ import datetime
 
 import streamlit as st
 
-from work_daigest.main import datetime_to_readable_date, PROMPT_TEMPLATE, process_data
+from work_daigest.main import PROMPT_TEMPLATE, datetime_to_readable_date, process_data
 
 # Title and description
 st.set_page_config(layout="wide")
